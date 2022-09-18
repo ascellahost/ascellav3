@@ -1,0 +1,22 @@
+name = "ascella"
+main = "dist/index.mjs"
+compatibility_date = "2022-05-28"
+compatibility_flags = []
+
+[[r2_buckets]]
+binding = "ASCELLA_DATA"
+bucket_name = "data"
+
+[[d1_databases]]
+binding = "ASCELLA_DB"
+bucket_name = "db"
+
+
+[build]
+command = "node build.js"
+
+[miniflare]
+kv_persist = true
+cache_persist = true
+durable_objects_persist = true
+# r2_persist = "./data/"
