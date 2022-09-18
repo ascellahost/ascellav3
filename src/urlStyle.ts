@@ -1,15 +1,18 @@
 import { ulidFactory } from "ulid-workers";
 import emojis from "./emojis.json" assert { type: "json" };
+
+/* Some code was copied from  https://github.com/tycrek/ass */
+
 const ulid = ulidFactory();
 
-const lengthGen = (length: number, charset: string[]): string => {
-  const bytes = new Uint8Array(length);
-  crypto.getRandomValues(bytes);
-  return [...bytes].map((byte) => charset[Number(byte) % charset.length])
-    .join("").slice(1).concat(charset[0]);
-};
+const lengthGen = (length: number, charset: string[]): string =>
+  [...crypto.getRandomValues(new Uint8Array(length + 5))].map((byte) =>
+    charset[Number(byte) % charset.length]
+  )
+    .join("").slice(0, length);
 
 const zeroWidthChars = ["\u200B", "\u200C", "\u200D", "\u2060"];
+
 const zws = ({ length }: { length: number }) =>
   lengthGen(length, zeroWidthChars);
 
@@ -21,15 +24,15 @@ const def = ({ length }: { length: number }) => lengthGen(length, defChars);
 const emoji = ({ length }: { length: number }) => lengthGen(length, emojis);
 
 export enum Styles {
-  default = 0,
-  uuid = 1,
-  zws = 2,
-  ulid = 3,
-  emoji = 4,
-  filename = 5,
+  default = 1,
+  uuid = 2,
+  zws = 3,
+  ulid = 4,
+  emoji = 5,
+  filename = 6,
 }
 //TODO: maybe gfycat
-export function genVanity(style: Styles, length = 8) {
+export function genVanity(style: Styles, length = 8): string {
   switch (style) {
     case Styles.default:
       return def({ length });
@@ -42,6 +45,6 @@ export function genVanity(style: Styles, length = 8) {
     case Styles.emoji:
       return emoji({ length });
     case Styles.filename:
-      return undefined;
+      return undefined as unknown as string;
   }
 }
