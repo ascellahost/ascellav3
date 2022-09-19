@@ -2,6 +2,9 @@ name = "ascella"
 main = "dist/index.mjs"
 compatibility_date = "2022-05-28"
 compatibility_flags = []
+kv_namespaces = [
+  { binding = "ASCELLA_KV" },
+]
 
 [[r2_buckets]]
 binding = "ASCELLA_DATA"
@@ -10,6 +13,8 @@ bucket_name = "data"
 [[d1_databases]]
 binding = "ASCELLA_DB"
 bucket_name = "db"
+env_path = ".env.test"
+
 
 
 [build]
@@ -19,4 +24,5 @@ command = "node build.js"
 kv_persist = true
 cache_persist = true
 durable_objects_persist = true
+env_path=".env"
 # r2_persist = "./data/"

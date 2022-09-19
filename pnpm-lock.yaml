@@ -5,6 +5,8 @@ specifiers:
   '@miniflare/d1': ^2.9.0
   '@miniflare/shared': ^2.9.0
   '@types/mime-types': ^2.1.1
+  discord-api-types: ^0.37.10
+  discord-interactions: ^3.2.0
   esbuild: ^0.14.54
   hono: ^2.1.4
   mime-types: ^2.1.35
@@ -14,11 +16,15 @@ specifiers:
   ulid-workers: ^2.0.0
   wrangler: ^2.1.4
 
+dependencies:
+  discord-api-types: 0.37.10
+
 devDependencies:
   '@cloudflare/workers-types': 3.16.0
   '@miniflare/d1': 2.9.0
   '@miniflare/shared': 2.9.0
   '@types/mime-types': 2.1.1
+  discord-interactions: 3.2.0
   esbuild: 0.14.54
   hono: 2.1.4
   mime-types: 2.1.35
@@ -332,6 +338,17 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+    dev: true
+
+  /discord-api-types/0.37.10:
+    resolution: {integrity: sha512-NvDh2Puc3wZQzQt2zLavlI5ewBnLFjI46/NJmvWIs6OC0JOkq7KcmH4s80X2+22mSQ3wUyge2mxq3cGYRT2noQ==}
+    dev: false
+
+  /discord-interactions/3.2.0:
+    resolution: {integrity: sha512-/J25RpYlokRW+2HmU5C2xo9bcgCWIzCl+MRRLCL/XvD+Hqe2WyQc639vUUKUNi6hdSdWb2kGNZDkMZxDky2dZg==}
+    engines: {node: '>=12'}
+    dependencies:
+      tweetnacl: 1.0.3
     dev: true
 
   /dotenv/10.0.0:
@@ -1126,6 +1143,10 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+    dev: true
+
+  /tweetnacl/1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
     dev: true
 
   /typescript/4.8.3:

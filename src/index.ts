@@ -1,11 +1,28 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { extension } from "mime-types";
-import { badRequest, notFound } from "./errors";
+import { authError, badRequest, basicData, notFound } from "./errors";
 import { genVanity, Styles } from "./urlStyle";
-
+import { verifyKey } from "discord-interactions";
+import {
+  APIBaseInteraction,
+  APIChatInputApplicationCommandInteractionData,
+  APIEmbed,
+  APIMessageApplicationCommandInteractionData,
+  ApplicationCommandOptionType,
+  InteractionResponseType,
+  InteractionType,
+} from "discord-api-types/v10";
+import { AscellaContext, commands, handleCommand } from "./commands/mod";
 const app = new Hono<{ Bindings: Bindings }>();
 
 const backend = "http://127.0.0.1:8787";
+
+enum UploadLimits {
+  Guest = 1024 * 1024 * 5,
+  User = 1024 * 1024 * 10,
+  Premium = 1024 * 1024 * 100,
+  Admin = 1024 * 1024 * 512,
+}
 
 const testUser = {
   email: "Tricked@tricked.pro",
@@ -13,6 +30,7 @@ const testUser = {
   domain: "i.ascella.host",
   uuid: crypto.randomUUID(),
   append: null,
+  limit: UploadLimits.Admin,
   url_style: Styles.default,
 };
 let getHeaderDefaults = (user: Record<string, any>, headers: Headers) => {
@@ -36,6 +54,9 @@ let getHeaderDefaults = (user: Record<string, any>, headers: Headers) => {
   }
   return defaults;
 };
+app.notFound(async (c) =>
+  Response.json(basicData(200, "Welcome to the Ascella API", true))
+);
 app.get("/cdn/:id/:file", async (c) => {
   const { id, file } = await c.req.param();
   let res = await c.env.ASCELLA_DATA.get(`${id}/${file}`) as
@@ -44,7 +65,31 @@ app.get("/cdn/:id/:file", async (c) => {
   if (!res) return notFound();
   return new Response(res.body);
 });
+app.get("/api/v3/file/:vanity", async (c) => {
+  const { vanity } = await c.req.param();
+  let res = await c.env.ASCELLA_DATA.get(`${vanity}`) as
+    | R2ObjectBody
+    | null;
+  if (!res) return notFound();
+  return new Response(res.body);
+});
 app.post("/api/v3/upload", async (c) => {
+  if (await c.env.ASCELLA_KV.get("shutdown") == "true") {
+    return badRequest("Aascella is currently shutdown");
+  }
+  let user;
+  if (c.req.headers.get("x-ascella-token")) {
+    user = testUser;
+  } else {
+    user = {
+      email: "",
+      name: "",
+      domain: "",
+      uuid: "guest",
+      limit: UploadLimits.Guest,
+    };
+  }
+
   let form: FormData;
   try {
     form = await c.req.formData();
@@ -56,10 +101,10 @@ app.post("/api/v3/upload", async (c) => {
   if (file instanceof File) {
     let ext = extension(file.type) || "png";
     let filename = `${genVanity(Styles.ulid)}.${ext}`;
-    const settings = getHeaderDefaults(testUser, c.req.headers);
+    const settings = getHeaderDefaults(user, c.req.headers);
     const vanity = settings.vanity ||
       genVanity(settings.url_style, settings.length);
-    console.log(vanity);
+
     if (!vanity) return badRequest("Invalid url style");
     let url = [
       `https://${settings.domain}/`,
@@ -69,7 +114,7 @@ app.post("/api/v3/upload", async (c) => {
     ].join("");
 
     let res = await c.env.ASCELLA_DATA.put(
-      `${testUser.uuid}/${filename}`,
+      `${user.uuid}/${filename}`,
       file,
       {
         // TODO: add delete at property
@@ -81,7 +126,7 @@ app.post("/api/v3/upload", async (c) => {
         },
       },
     );
-    const raw = `${backend}/cdn/${testUser.uuid}/${filename}`;
+    const raw = `${backend}/cdn/${user.uuid}/${filename}`;
     return Response.json({
       filename: filename,
       raw: raw,
@@ -93,6 +138,45 @@ app.post("/api/v3/upload", async (c) => {
   } else {
     return badRequest("Invalid file");
   }
+});
+
+app.post("/discord", async (c) => {
+  // Using the incoming headers, verify this request actually came from discord.
+  const signature = c.req.headers.get("x-signature-ed25519")!;
+  const timestamp = c.req.headers.get("x-signature-timestamp")!;
+  const body = await c.req.clone().arrayBuffer();
+
+  const isValidRequest = verifyKey(
+    body,
+    signature,
+    timestamp,
+    c.env.CLIENT_PUB,
+  );
+
+  if (!isValidRequest) {
+    return authError();
+  }
+  const message = await c.req.json<
+    APIBaseInteraction<
+      InteractionType.ApplicationCommand,
+      APIChatInputApplicationCommandInteractionData
+    >
+  >();
+  //@ts-ignore -
+  if (message.type === InteractionType.Ping) {
+    // The `PING` message is used during the initial webhook handshake, and is
+    // required to configure the webhook in the developer portal.
+    console.log("Handling Ping request");
+    return Response.json({
+      type: InteractionResponseType.Pong,
+    });
+  }
+
+  if (message.type === InteractionType.ApplicationCommand) {
+    return await handleCommand(message, c);
+  }
+
+  return Response.json({ error: "Unknown Type" }, { status: 400 });
 });
 
 export default app;
