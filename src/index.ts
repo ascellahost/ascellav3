@@ -3,15 +3,8 @@ import { extension } from "mime-types";
 import { authError, badRequest, basicData, notFound } from "./errors";
 import { genVanity, Styles } from "./urlStyle";
 import { verifyKey } from "discord-interactions";
-import {
-  APIBaseInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIEmbed,
-  APIMessageApplicationCommandInteractionData,
-  ApplicationCommandOptionType,
-  InteractionResponseType,
-  InteractionType,
-} from "discord-api-types/v10";
+import type { DiscordInteraction } from "discordeno/types";
+import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -157,10 +150,7 @@ app.post("/discord", async (c) => {
     return authError();
   }
   const message = await c.req.json<
-    APIBaseInteraction<
-      InteractionType.ApplicationCommand,
-      APIChatInputApplicationCommandInteractionData
-    >
+    DiscordInteraction
   >();
   //@ts-ignore -
   if (message.type === InteractionType.Ping) {
@@ -168,11 +158,11 @@ app.post("/discord", async (c) => {
     // required to configure the webhook in the developer portal.
     console.log("Handling Ping request");
     return Response.json({
-      type: InteractionResponseType.Pong,
+      type: InteractionTypes.Ping,
     });
   }
 
-  if (message.type === InteractionType.ApplicationCommand) {
+  if (message.type === InteractionTypes.ApplicationCommand) {
     return await handleCommand(message, c);
   }
 

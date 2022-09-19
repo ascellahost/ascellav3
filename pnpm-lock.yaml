@@ -5,8 +5,8 @@ specifiers:
   '@miniflare/d1': ^2.9.0
   '@miniflare/shared': ^2.9.0
   '@types/mime-types': ^2.1.1
-  discord-api-types: ^0.37.10
   discord-interactions: ^3.2.0
+  discordeno: ^16.0.0
   esbuild: ^0.14.54
   hono: ^2.1.4
   mime-types: ^2.1.35
@@ -16,15 +16,13 @@ specifiers:
   ulid-workers: ^2.0.0
   wrangler: ^2.1.4
 
-dependencies:
-  discord-api-types: 0.37.10
-
 devDependencies:
   '@cloudflare/workers-types': 3.16.0
   '@miniflare/d1': 2.9.0
   '@miniflare/shared': 2.9.0
   '@types/mime-types': 2.1.1
   discord-interactions: 3.2.0
+  discordeno: 16.0.0
   esbuild: 0.14.54
   hono: 2.1.4
   mime-types: 2.1.35
@@ -44,6 +42,21 @@ packages:
 
   /@cloudflare/workers-types/3.16.0:
     resolution: {integrity: sha512-gaBUSaKS65mN3iKZEgichbXYEmAa/pXkc5Gbt+1BptYphdGkj09ggdsiE4w8g0F/uI1g36QaTKrzVnBAWMipvQ==}
+    dev: true
+
+  /@deno/shim-deno-test/0.3.3:
+    resolution: {integrity: sha512-Ge0Tnl7zZY0VvEfgsyLhjid8DzI1d0La0dgm+3m0/A8gZXgp5xwlyIyue5e4SCUuVB/3AH/0lun9LcJhhTwmbg==}
+    dev: true
+
+  /@deno/shim-deno/0.9.0:
+    resolution: {integrity: sha512-iP+qdI4Oy/Mw9yv40TqdjNKL+stpKDo8drki2cKisTXgZf+GoIdMhIuODxSypRyv6wxIuHNx7ZiKE3Sl3kAHuw==}
+    dependencies:
+      '@deno/shim-deno-test': 0.3.3
+      which: 2.0.2
+    dev: true
+
+  /@deno/shim-timers/0.1.0:
+    resolution: {integrity: sha512-XFRnB5Rtbkd5RiYHwhugNK9gvDgYXmFTUOT5dmhWCKG7WnOWZggbJMnH1NcyYS3QgHvmaTOaHCyNFNSv57j3Dg==}
     dev: true
 
   /@esbuild-plugins/node-globals-polyfill/0.1.1_esbuild@0.14.51:
@@ -340,15 +353,23 @@ packages:
       which: 2.0.2
     dev: true
 
-  /discord-api-types/0.37.10:
-    resolution: {integrity: sha512-NvDh2Puc3wZQzQt2zLavlI5ewBnLFjI46/NJmvWIs6OC0JOkq7KcmH4s80X2+22mSQ3wUyge2mxq3cGYRT2noQ==}
-    dev: false
-
   /discord-interactions/3.2.0:
     resolution: {integrity: sha512-/J25RpYlokRW+2HmU5C2xo9bcgCWIzCl+MRRLCL/XvD+Hqe2WyQc639vUUKUNi6hdSdWb2kGNZDkMZxDky2dZg==}
     engines: {node: '>=12'}
     dependencies:
       tweetnacl: 1.0.3
+    dev: true
+
+  /discordeno/16.0.0:
+    resolution: {integrity: sha512-yPK//WKY1r7IWrdgD6q/Wc2zTbhZM4xecJcsvPEc42uF6ttdKjV+pPFl/lZK0sFC7MtQKHQYI3lTkjfs+mNznA==}
+    dependencies:
+      '@deno/shim-deno': 0.9.0
+      '@deno/shim-timers': 0.1.0
+      undici: 5.9.1
+      ws: 8.8.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
     dev: true
 
   /dotenv/10.0.0:

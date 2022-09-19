@@ -1,14 +1,12 @@
 import { AscellaContext, commands, createOption } from "./mod";
+import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
 import {
-  APIBaseInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIEmbed,
-  APIMessageApplicationCommandInteractionData,
-  ApplicationCommandOptionType,
-  ApplicationCommandType,
-  InteractionResponseType,
-  InteractionType,
-} from "discord-api-types/v10";
+  ApplicationCommandFlags,
+  ApplicationCommandOptionTypes,
+  ApplicationCommandTypes,
+  InteractionResponseTypes,
+  InteractionTypes,
+} from "discordeno/types";
 
 export default {
   name: "commands",

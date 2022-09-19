@@ -1,11 +1,11 @@
+import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
 import {
-  APIBaseInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIEmbed,
-  ApplicationCommandOptionType,
-  InteractionResponseType,
-  InteractionType,
-} from "discord-api-types/v10";
+  ApplicationCommandFlags,
+  ApplicationCommandOptionTypes,
+  ApplicationCommandTypes,
+  InteractionResponseTypes,
+  InteractionTypes,
+} from "discordeno/types";
 import { Context } from "hono";
 
 import shutdown from "./shutdown";
@@ -13,7 +13,7 @@ import cmds from "./commands";
 export function createOption(
   name: string,
   description: string,
-  type: ApplicationCommandOptionType = ApplicationCommandOptionType.String,
+  type: ApplicationCommandOptionTypes = ApplicationCommandOptionTypes.String,
   required = false,
 ) {
   return {
@@ -25,10 +25,7 @@ export function createOption(
 }
 export class AscellaContext {
   constructor(
-    private data: APIBaseInteraction<
-      InteractionType.ApplicationCommand,
-      APIChatInputApplicationCommandInteractionData
-    >,
+    private data: DiscordInteraction,
     private context: Context<string, {
       Bindings: Bindings;
     }>,
@@ -52,8 +49,8 @@ export class AscellaContext {
   getValue<T>(name: string, required: boolean): T | undefined {
     let option = this.options?.find((x) => x.name === name);
     if (
-      !option || option.type == ApplicationCommandOptionType.Subcommand ||
-      option.type == ApplicationCommandOptionType.SubcommandGroup
+      !option || option.type == ApplicationCommandOptionTypes.SubCommand ||
+      option.type == ApplicationCommandOptionTypes.SubCommandGroup
     ) {
       if (required) {
         throw new Error(`Missing required option ${name}`);
@@ -68,11 +65,11 @@ export class AscellaContext {
     ephemeral,
   }: {
     content?: string;
-    embeds?: APIEmbed[];
+    embeds?: DiscordEmbed[];
     ephemeral?: boolean;
   }) {
     return this.context.json({
-      type: InteractionResponseType.ChannelMessageWithSource,
+      type: InteractionResponseTypes.ChannelMessageWithSource,
       data: {
         content,
         embeds,
@@ -98,10 +95,7 @@ export class AscellaContext {
 export const commands = [shutdown, cmds] as const;
 
 export async function handleCommand(
-  data: APIBaseInteraction<
-    InteractionType.ApplicationCommand,
-    APIChatInputApplicationCommandInteractionData
-  >,
+  data: DiscordInteraction,
   context: Context<string, {
     Bindings: Bindings;
   }>,

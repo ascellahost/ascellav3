@@ -1,14 +1,12 @@
 import { AscellaContext, createOption } from "./mod";
+import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
 import {
-  APIBaseInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIEmbed,
-  APIMessageApplicationCommandInteractionData,
-  ApplicationCommandOptionType,
-  ApplicationCommandType,
-  InteractionResponseType,
-  InteractionType,
-} from "discord-api-types/v10";
+  ApplicationCommandFlags,
+  ApplicationCommandOptionTypes,
+  ApplicationCommandTypes,
+  InteractionResponseTypes,
+  InteractionTypes,
+} from "discordeno/types";
 export default {
   name: "shutdown",
   "description": "Shuts down the uploader in case of ddos",
@@ -16,7 +14,7 @@ export default {
     createOption(
       "unshutdown",
       "Unshuts down the uploader in case of ddos",
-      ApplicationCommandOptionType.Boolean,
+      ApplicationCommandOptionTypes.Boolean,
       false,
     ),
   ],
