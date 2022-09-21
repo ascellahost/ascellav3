@@ -1,18 +1,32 @@
-# Miniflare Example Project
+# Ascella (to the clouds)
 
-This is an example [Cloudflare Workers](https://workers.cloudflare.com/) project that uses [Miniflare](https://github.com/cloudflare/miniflare) for local development, [TypeScript](https://www.typescriptlang.org/), [esbuild](https://github.com/evanw/esbuild) for bundling, and [Jest](https://jestjs.io/) for testing, with [Miniflare's custom Jest environment](https://miniflare.dev/testing/jest).
+This is Ascella but fully rewritten to work with the Cloudflare ecosystem
 
-```shell
-# Install dependencies
-$ npm install
-# Start local development server with live reload
-$ npm run dev
-# Start remote development server using wrangler
-$ npm run dev:remote
-# Run tests
-$ npm test
-# Run type checking
-$ npm run types:check
-# Deploy using wrangler
-$ npm run deploy
+## Status
+
+- [x] Backend
+- [ ] Embed Service
+- [ ] Website
+
+## Developing
+
+Create a .env file with the following contents (available on the discord dashboard):
+
+```env
+# .env
+CLIENT_ID=
+CLIENT_PUB=
+CLIENT_SECRET=
+CLIENT_TOKEN=
+```
+
+### Creating the tables
+
+Open `BACKEND_URL/discord?token=CLIENT_TOKEN` in your browser to create the tables and initialize the commands.
+
+### Running the backend
+
+```bash
+pnpm i
+pnpm dev
 ```

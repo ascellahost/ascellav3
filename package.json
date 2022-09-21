@@ -19,14 +19,14 @@
     ".",
     "ascella-embeds/",
     "ascella-web/",
-    "ascella-common/"
+    "common/"
   ],
   "devDependencies": {
     "@cloudflare/workers-types": "^3.16.0",
     "@miniflare/d1": "^2.9.0",
     "@miniflare/shared": "^2.9.0",
     "@types/mime-types": "^2.1.1",
-    "ascella-common": "workspace:./ascella-common",
+    "common": "workspace:./common",
     "d1-orm": "^0.2.1",
     "discord-interactions": "^3.2.0",
     "discordeno": "^16.0.0",

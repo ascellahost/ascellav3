@@ -1,4 +1,5 @@
 import { ulidFactory } from "ulid-workers";
+import { Styles } from "common/build/main";
 import emojis from "./emojis.json" assert { type: "json" };
 
 /* Some code was copied from  https://github.com/tycrek/ass */
@@ -23,14 +24,6 @@ const def = ({ length }: { length: number }) => lengthGen(length, defChars);
 
 const emoji = ({ length }: { length: number }) => lengthGen(length, emojis);
 
-export enum Styles {
-  default = 1,
-  uuid = 2,
-  zws = 3,
-  ulid = 4,
-  emoji = 5,
-  filename = 6,
-}
 //TODO: maybe gfycat
 export function genVanity(style: Styles, length = 8): string {
   switch (style) {

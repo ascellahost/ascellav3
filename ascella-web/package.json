@@ -16,7 +16,7 @@
     "@sveltejs/kit": "next",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
-    "ascella-common": "workspace:../ascella-common",
+    "common": "workspace:../common",
     "autoprefixer": "^10.4.11",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.3.0",

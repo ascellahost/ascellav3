@@ -1,36 +1,7 @@
 import { D1Orm, DataTypes, Model } from "d1-orm";
-import { UploadLimits } from "ascella-common";
-export type User = {
-  email: string;
-  name: string;
-  domain: string;
-  token: string;
-  uuid: string;
-  id: number;
-  upload_limit: UploadLimits;
-};
-export type Domain = {
-  id: number;
-  domain: string;
-  apex: 0 | 1;
-  official: 0 | 1;
-  private?: string;
-};
-export type File = {
-  id: number;
-  name: string;
-  size: number;
-  type: string;
-  vanity: string;
-  upload_name: string;
-  uploader?: number;
-};
-export type Review = {
-  id: number;
-  name: string;
-  avatar: string;
-  comment: string;
-};
+import { UploadLimits } from "common/build/main";
+import { Domain, File, Review, User } from "common/build/main";
+
 export function getOrm(db: D1Database) {
   const orm = new D1Orm(db);
   const users = new Model<User>(

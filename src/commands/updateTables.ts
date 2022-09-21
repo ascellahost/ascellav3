@@ -20,7 +20,6 @@ export default {
     ),
   ],
   async exec(ctx: AscellaContext) {
-    const { users, domains, files, reviews } = ctx.tables;
     const force = ctx.getValue<boolean>("force", false) ? "force" : "default";
     try {
       await initTables(ctx.orm, force);

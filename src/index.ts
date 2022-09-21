@@ -1,12 +1,13 @@
 import { Context, Hono } from "hono";
 import { extension } from "mime-types";
 import { authError, badRequest, basicData, notFound } from "./errors";
-import { genVanity, Styles } from "./urlStyle";
+import { genVanity } from "./urlStyle";
 import { verifyKey } from "discord-interactions";
 import type { DiscordInteraction } from "discordeno/types";
 import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
 import api from "./api";
+import { Styles } from "common/build/main";
 import { initTables } from "./orm";
 export const app = new Hono<{ Bindings: Bindings }>();
 
