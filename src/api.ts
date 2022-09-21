@@ -24,13 +24,14 @@ const backend = "http://127.0.0.1:8787";
 
 api.get("/files/:vanity", async (c) => {
   const { vanity } = await c.req.param();
-  const [_, { files }] = await getOrm(c.env.__D1_BETA__);
+  const [_, { files }] = getOrm(c.env.__D1_BETA__);
   const file = await files.First({
     where: {
       vanity,
     },
   });
   if (!file) return notFound();
+  // @ts-expect-error - d1-orm types bug
   const loc = `${file.uploader || "guest"}/${file.name}`;
   const meta = await c.env.ASCELLA_DATA.head(
     loc,
@@ -48,18 +49,11 @@ api.get("/files/:vanity", async (c) => {
     });
     return notFound();
   }
+  delete meta.customMetadata["expires-at"];
   return Response.json({
     raw: `${backend}/cdn/${loc}`,
     views: 0,
-    embed: {
-      color: "#000000",
-      title: "ascella",
-      description: "ascella",
-      sitename: "ascella",
-      sitenameUrl: "https://ascella.host",
-      author: "ascella",
-      authorUrl: "https://ascella.host",
-    },
+    embed: meta.customMetadata,
   });
 });
 
@@ -156,11 +150,12 @@ api.post("/upload", async (c) => {
         customMetadata: {
           "expires-at": (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000)
             .toString(),
+          ...settings.embed,
         },
       },
     );
     const raw = `${backend}/cdn/${user.uuid}/${filename}`;
-    fOrm.InsertOne({
+    await fOrm.InsertOne({
       //@ts-expect-error - this is a bug in the orm
       data: {
         name: filename,

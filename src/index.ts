@@ -7,6 +7,7 @@ import type { DiscordInteraction } from "discordeno/types";
 import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
 import api from "./api";
+import { initTables } from "./orm";
 export const app = new Hono<{ Bindings: Bindings }>();
 
 app.notFound(async (c) => Response.json(notFound()));
@@ -60,6 +61,34 @@ app.post("/discord", async (c) => {
   }
 
   return Response.json({ error: "Unknown Type" }, { status: 400 });
+}).get(async (c) => {
+  const { token, force } = c.req.query();
+  if (!token) {
+    return Response.json({ error: "Missing Token" }, { status: 400 });
+  }
+  if (token != c.env.CLIENT_TOKEN) {
+    return Response.json({ error: "Invalid Token" }, { status: 401 });
+  }
+  try {
+    await initTables(
+      c.env.__D1_BETA__,
+      (force as "default" | "force") || "default",
+    );
+  } catch {
+    return Response.json({ error: "Failed to init tables" }, { status: 500 });
+  }
+  const res = await AscellaContext.rest(
+    c.env.CLIENT_TOKEN,
+    `/applications/${c.env.CLIENT_ID}/commands`,
+    {
+      method: "PUT",
+      body: commands,
+    },
+  );
+  return Response.json({
+    status: res.status,
+    body: await res.json(),
+  });
 });
 
 app.route("/api/v3", api);

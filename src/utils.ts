@@ -20,5 +20,20 @@ export let getHeaderDefaults = (
   if (length) {
     defaults.length = length;
   }
+  defaults.embed = {};
+
+  [
+    "color",
+    "title",
+    "description",
+    "sitename",
+    "sitename-url",
+    "author",
+    "author-url",
+  ].forEach((x) => {
+    let val = headers.get(`x-ascella-og-${x}`);
+    if (val) defaults.embed[x] = val;
+  });
+
   return defaults;
 };

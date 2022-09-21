@@ -173,3 +173,19 @@ export function getOrm(db: D1Database) {
 
   return [orm, { users, domains, files, reviews }] as const;
 }
+
+export async function initTables(db: D1Database, force: "default" | "force") {
+  const [orm, { users, domains, files, reviews }] = getOrm(db);
+  await users.CreateTable({
+    strategy: force,
+  });
+  await domains.CreateTable({
+    strategy: force,
+  });
+  await files.CreateTable({
+    strategy: force,
+  });
+  await reviews.CreateTable({
+    strategy: force,
+  });
+}

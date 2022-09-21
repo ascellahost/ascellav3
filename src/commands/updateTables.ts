@@ -7,7 +7,7 @@ import {
   InteractionResponseTypes,
   InteractionTypes,
 } from "discordeno/types";
-import { getOrm } from "@/orm";
+import { getOrm, initTables } from "@/orm";
 export default {
   name: "update-tables",
   "description": "Updates the tables",
@@ -23,18 +23,7 @@ export default {
     const { users, domains, files, reviews } = ctx.tables;
     const force = ctx.getValue<boolean>("force", false) ? "force" : "default";
     try {
-      await users.CreateTable({
-        strategy: force,
-      });
-      await domains.CreateTable({
-        strategy: force,
-      });
-      await files.CreateTable({
-        strategy: force,
-      });
-      await reviews.CreateTable({
-        strategy: force,
-      });
+      await initTables(ctx.orm, force);
       return ctx.send({
         content: `Success`,
       });

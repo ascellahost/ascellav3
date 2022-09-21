@@ -89,7 +89,9 @@ export class AscellaContext {
       },
     });
   }
-  async rest(
+
+  static async rest(
+    token: string,
     endpoint: string,
     options?: { body?: Record<string, any>; method?: string },
   ) {
@@ -98,9 +100,20 @@ export class AscellaContext {
       body: options?.body ? JSON.stringify(options?.body) : undefined,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bot ${this.context.env.CLIENT_TOKEN}`,
+        "Authorization": `Bot ${token}`,
       },
     });
+  }
+
+  async rest(
+    endpoint: string,
+    options?: { body?: Record<string, any>; method?: string },
+  ) {
+    return await AscellaContext.rest(
+      this.context.env.CLIENT_TOKEN,
+      endpoint,
+      options,
+    );
   }
 }
 
