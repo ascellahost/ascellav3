@@ -174,6 +174,9 @@ api.post("/upload", async (c) => {
       `${user.uuid}/${filename}`,
       file,
       {
+        httpMetadata: {
+          "contentType": file.type,
+        },
         // TODO: add delete at property
         customMetadata: {
           "expires-at": (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000)

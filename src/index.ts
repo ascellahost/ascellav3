@@ -25,7 +25,11 @@ app.get("/cdn/:id/:file", async (c) => {
     | R2ObjectBody
     | null;
   if (!res) return notFound();
-  return new Response(res.body);
+  return new Response(res.body, {
+    headers: {
+      "Content-Type": res.httpMetadata?.["contentType"] || "image/png",
+    },
+  });
 });
 
 app.post("/discord", async (c) => {
