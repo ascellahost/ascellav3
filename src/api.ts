@@ -22,6 +22,31 @@ const testUser = {
 
 const backend = "http://127.0.0.1:8787";
 
+api.get("/files/:vanity/delete/:delete", async (c) => {
+  const { vanity, delete: del } = await c.req.param();
+  const [_, { files }] = getOrm(c.env.__D1_BETA__);
+  const file = await files.First({
+    where: {
+      vanity,
+    },
+  });
+  if (!file) return notFound();
+  // @ts-expect-error - d1-orm types bug
+  const loc = `${file.uploader || "guest"}/${file.name}`;
+  const meta = await c.env.ASCELLA_DATA.head(
+    loc,
+  );
+  if (!meta?.customMetadata) return notFound();
+  if (meta.customMetadata["delete"] !== del) return authError();
+  await c.env.ASCELLA_DATA.delete(loc);
+  await files.Delete({
+    where: {
+      vanity,
+    },
+  });
+  return Response.json(basicData(202, "File deleted", true));
+});
+
 api.get("/files/:vanity", async (c) => {
   const { vanity } = await c.req.param();
   const [_, { files }] = getOrm(c.env.__D1_BETA__);
@@ -50,6 +75,8 @@ api.get("/files/:vanity", async (c) => {
     return notFound();
   }
   delete meta.customMetadata["expires-at"];
+  delete meta.customMetadata["delete"];
+
   return Response.json({
     raw: `${backend}/cdn/${loc}`,
     views: 0,
@@ -131,6 +158,7 @@ api.post("/upload", async (c) => {
 
     let ext = extension(file.type) || "png";
     let filename = `${genVanity(Styles.ulid)}.${ext}`;
+    const del = genVanity(Styles.ulid);
     const settings = getHeaderDefaults(user, c.req.headers);
     const vanity = settings.vanity ||
       genVanity(settings.url_style, settings.length);
@@ -150,6 +178,7 @@ api.post("/upload", async (c) => {
         customMetadata: {
           "expires-at": (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000)
             .toString(),
+          "delete": del,
           ...settings.embed,
         },
       },
@@ -169,6 +198,7 @@ api.post("/upload", async (c) => {
       filename: filename,
       raw: raw,
       upload_date: res.uploaded.toISOString(),
+      delete: `${backend}/files/${vanity}/delete/${del}`,
       size: res.size,
       vanity: vanity,
       url,
