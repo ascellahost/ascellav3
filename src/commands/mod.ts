@@ -10,6 +10,11 @@ import { Context } from "hono";
 
 import shutdown from "./shutdown";
 import cmds from "./commands";
+import updateTables from "./updateTables";
+import addDomain from "./addDomain";
+import review from "./review";
+
+import { getOrm } from "@/orm";
 export function createOption(
   name: string,
   description: string,
@@ -24,12 +29,17 @@ export function createOption(
   };
 }
 export class AscellaContext {
+  tables: ReturnType<typeof getOrm>[1];
+  orm: ReturnType<typeof getOrm>[0];
   constructor(
     private data: DiscordInteraction,
     private context: Context<string, {
       Bindings: Bindings;
     }>,
   ) {
+    const orm = getOrm(this.context.env.__D1_BETA__);
+    this.orm = orm[0];
+    this.tables = orm[1];
   }
   get name() {
     return this.data.data?.name;
@@ -46,6 +56,8 @@ export class AscellaContext {
   get clientId() {
     return this.context.env.CLIENT_ID;
   }
+  getValue<T>(name: string, required: false): T | undefined;
+  getValue<T>(name: string, required: true): T;
   getValue<T>(name: string, required: boolean): T | undefined {
     let option = this.options?.find((x) => x.name === name);
     if (
@@ -92,7 +104,13 @@ export class AscellaContext {
   }
 }
 
-export const commands = [shutdown, cmds] as const;
+export const commands = [
+  shutdown,
+  cmds,
+  updateTables,
+  addDomain,
+  review,
+] as const;
 
 export async function handleCommand(
   data: DiscordInteraction,

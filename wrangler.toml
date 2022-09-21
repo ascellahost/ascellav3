@@ -11,7 +11,7 @@ binding = "ASCELLA_DATA"
 bucket_name = "data"
 
 [[d1_databases]]
-binding = "ASCELLA_DB"
+binding = "__D1_BETA__"
 bucket_name = "db"
 env_path = ".env.test"
 

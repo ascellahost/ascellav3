@@ -5,6 +5,8 @@ specifiers:
   '@miniflare/d1': ^2.9.0
   '@miniflare/shared': ^2.9.0
   '@types/mime-types': ^2.1.1
+  ascella-common: workspace:./ascella-common
+  d1-orm: ^0.2.1
   discord-interactions: ^3.2.0
   discordeno: ^16.0.0
   esbuild: ^0.14.54
@@ -21,6 +23,8 @@ devDependencies:
   '@miniflare/d1': 2.9.0
   '@miniflare/shared': 2.9.0
   '@types/mime-types': 2.1.1
+  ascella-common: link:ascella-common
+  d1-orm: 0.2.1
   discord-interactions: 3.2.0
   discordeno: 16.0.0
   esbuild: 0.14.54
@@ -351,6 +355,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+    dev: true
+
+  /d1-orm/0.2.1:
+    resolution: {integrity: sha512-Y+x4GQPvP8WzDoRUePCCfG4KPNKru5vxYHaaU5zeMcHvkvy3ZCXGJoZBhGm9DBP0tkU0N+H4DI/Gs6JncgTJeQ==}
     dev: true
 
   /discord-interactions/3.2.0:

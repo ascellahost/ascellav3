@@ -1,10 +1,16 @@
-export const basicData = (status: number, message: string, success = false) => {
+export const basicData = (
+  status: number,
+  message: string,
+  success = false,
+  opts?: Record<string, any>,
+) => {
   return {
     status,
     message,
     success,
     donate:
       "Like ascella? consider supporting me on github https://github.com/sponsors/Tricked-dev/",
+    ...opts,
   };
 };
 export const authError = () => {
