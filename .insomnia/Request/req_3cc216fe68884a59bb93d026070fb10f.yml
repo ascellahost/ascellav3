@@ -1,0 +1,21 @@
+_id: req_3cc216fe68884a59bb93d026070fb10f
+type: Request
+parentId: fld_wrk_10a68806c83944fa9df008030a8f7c2505d97e6e
+modified: 1663685040197
+created: 1663683495147
+url: "{{ _.base_url }}/stats.json"
+name: Stats
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1663684227847.875
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

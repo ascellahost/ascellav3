@@ -1,0 +1,10 @@
+_id: fld_wrk_10a68806c83944fa9df008030a8f7c2505d97e6e
+type: RequestGroup
+parentId: fld_c63e51b8e8ea46819ceb176c7db9e652
+modified: 1663746961973
+created: 1663684321141
+name: json
+description: This is a cached json endpoint
+environment: {}
+environmentPropertyOrder: null
+metaSortKey: -1663684321141

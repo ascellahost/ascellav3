@@ -1,0 +1,14 @@
+_id: env_5ee86b538e9d5808a655bc8f25d54bec889a8492
+type: Environment
+parentId: wrk_10a68806c83944fa9df008030a8f7c25
+modified: 1663745624358
+created: 1663683344080
+name: Base Environment
+data:
+  base_url: https://api.ascella.host/api/v3
+dataPropertyOrder:
+  "&":
+    - base_url
+color: null
+isPrivate: false
+metaSortKey: 1663683344080

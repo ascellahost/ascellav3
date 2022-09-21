@@ -1,0 +1,14 @@
+_id: env_6fc75470fdd944ddad2d56cf82f50cb9
+type: Environment
+parentId: env_5ee86b538e9d5808a655bc8f25d54bec889a8492
+modified: 1663745636316
+created: 1663683424208
+name: Development
+data:
+  base_url: http://127.0.0.1:8787/api/v3
+dataPropertyOrder:
+  "&":
+    - base_url
+color: "#00b9d1"
+isPrivate: false
+metaSortKey: 1663683424208
