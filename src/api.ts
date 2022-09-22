@@ -155,9 +155,12 @@ api.post("/upload", async (c) => {
 
   if (file instanceof File) {
     const [_, { files: fOrm }] = getOrm(c.env.__D1_BETA__);
-
-    let ext = extension(file.type) || "png";
-    let filename = `${genVanity(Styles.ulid)}.${ext}`;
+    const bannedFileTypes = ["application/"];
+    if (bannedFileTypes.some((x) => (file as File)?.type.startsWith(x))) {
+      return badRequest("Disallowed file type");
+    }
+    const ext = extension(file.type) || "png";
+    const filename = `${genVanity(Styles.ulid)}.${ext}`;
     const del = genVanity(Styles.ulid);
     const settings = getHeaderDefaults(user, c.req.headers);
     const vanity = settings.vanity ||
