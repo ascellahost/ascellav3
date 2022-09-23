@@ -14,7 +14,7 @@ try {
     external: ["__STATIC_CONTENT_MANIFEST"],
     plugins: [],
     conditions: ["worker", "browser"],
-    entryPoints: [path.join(__dirname, "src", "index.ts")],
+    entryPoints: [path.join(__dirname, "src", "index.tsx")],
     outdir: path.join(__dirname, "dist"),
     outExtension: { ".js": ".mjs" },
   });
