@@ -7,7 +7,7 @@ import type { DiscordInteraction } from "discordeno/types";
 import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
 import { Styles, UploadLimits } from "common/build/main";
-import { getHeaderDefaults } from "./utils";
+import { getHeaderDefaults, stringInject } from "./utils";
 import { getOrm } from "./orm";
 
 export const api = new Hono<{ Bindings: Bindings }>();
@@ -31,7 +31,6 @@ api.get("/files/:vanity/delete/:delete", async (c) => {
     },
   });
   if (!file) return notFound();
-  // @ts-expect-error - d1-orm types bug
   const loc = `${file.uploader || "guest"}/${file.name}`;
   const meta = await c.env.ASCELLA_DATA.head(
     loc,
@@ -56,7 +55,6 @@ api.get("/files/:vanity", async (c) => {
     },
   });
   if (!file) return notFound();
-  // @ts-expect-error - d1-orm types bug
   const loc = `${file.uploader || "guest"}/${file.name}`;
   const meta = await c.env.ASCELLA_DATA.head(
     loc,
@@ -132,7 +130,7 @@ api.post("/upload", async (c) => {
     return badRequest("Ascella is currently shutdown");
   }
   let user;
-  if (c.req.headers.get("x-ascella-token")) {
+  if (c.req.headers.get("ascella-token")) {
     user = testUser;
   } else {
     user = {
@@ -173,6 +171,23 @@ api.post("/upload", async (c) => {
       vanity,
       settings.ext ? `.${settings.ext}` : "",
     ].join("");
+    const replaces = {
+      ip: c.req.headers.get("cf-connecting-ip"),
+      filename: file.name,
+      vanity: vanity,
+      size: file.size,
+      type: file.type,
+      extension: ext,
+    };
+    const embed = {
+      color: settings.embed.color,
+      title: stringInject(settings.embed.title, replaces),
+      description: stringInject(settings.embed.description, replaces),
+      sitename: stringInject(settings.embed.sitename, replaces),
+      sitenameUrl: settings.embed.sitenameUrl as string,
+      author: stringInject(settings.embed.author, replaces),
+      authorUrl: settings.embed.authorUrl as string,
+    };
     let res = await c.env.ASCELLA_DATA.put(
       `${user.uuid}/${filename}`,
       file,
@@ -180,12 +195,13 @@ api.post("/upload", async (c) => {
         httpMetadata: {
           "contentType": file.type,
         },
-        // TODO: add delete at property
+
         customMetadata: {
           "expires-at": (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000)
             .toString(),
           "delete": del,
-          ...settings.embed,
+          "ip": c.req.headers.get("cf-connecting-ip") || "",
+          ...embed,
         },
       },
     );

@@ -26,19 +26,19 @@ headers:
     value: multipart/form-data
     id: pair_d8dd349d89904f009cd71a41613cb62f
   - id: pair_94c7d467c2cc4f43b15092070c04e1f1
-    name: x-ascella-domain
+    name: ascella-domain
     value: ascella.bad
     description: ""
   - id: pair_adcad5f9bbdb4ce6b79edc534d15a2a0
-    name: x-ascella-style
+    name: ascella-style
     value: "2"
     description: ""
   - id: pair_411c08cfce994204aabc5d75ee90f137
-    name: x-ascella-og-author
+    name: ascella-og-author
     value: Tricked is great
     description: ""
   - id: pair_1636a02fbe964cb3884c8735044da9d9
-    name: x-ascella-vanity
+    name: ascella-vanity
     value: ddddd
     description: ""
   - id: pair_62f87ad7bb5a45a3a2353d008cf65543

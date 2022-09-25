@@ -6,17 +6,17 @@ export let getHeaderDefaults = (
     ...user,
   };
   ["domain", "append", "vanity", "ext"].forEach((x) =>
-    defaults[x] = headers.get(`x-ascella-${x}`) || defaults[x]
+    defaults[x] = headers.get(`ascella-${x}`) || defaults[x]
   );
-  let style = parseInt(headers.get("x-ascella-style")!);
+  let style = parseInt(headers.get("ascella-style")!);
   if (style) {
     defaults.url_style = style;
   }
-  let autodelete = parseInt(headers.get("x-ascella-autodelete")!);
+  let autodelete = parseInt(headers.get("ascella-autodelete")!);
   if (autodelete) {
     defaults.autodelete = autodelete;
   }
-  let length = parseInt(headers.get("x-ascella-vanity-length")!);
+  let length = parseInt(headers.get("ascella-vanity-length")!);
   if (length) {
     defaults.length = length;
   }
@@ -31,9 +31,21 @@ export let getHeaderDefaults = (
     "author",
     "author-url",
   ].forEach((x) => {
-    let val = headers.get(`x-ascella-og-${x}`);
+    let val = headers.get(`ascella-og-${x}`);
     if (val) defaults.embed[x] = val;
   });
 
   return defaults;
 };
+export function stringInject(
+  str: string,
+  data: Record<string, any>,
+): string {
+  return str.replace(/({([^}]+)})/g, function (i) {
+    let key = i.replace(/{/, "").replace(/}/, "");
+    if (data[key] == null) {
+      return i;
+    }
+    return data[key];
+  });
+}

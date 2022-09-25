@@ -71,20 +71,20 @@ app.post("/discord", async (c) => {
   if (!token) {
     return Response.json({ error: "Missing Token" }, { status: 400 });
   }
-  if (token != c.env.CLIENT_TOKEN) {
+  if (token != c.env!.CLIENT_TOKEN) {
     return Response.json({ error: "Invalid Token" }, { status: 401 });
   }
   try {
     await initTables(
-      c.env.__D1_BETA__,
+      c.env!.__D1_BETA__,
       (force as "default" | "force") || "default",
     );
   } catch {
     return Response.json({ error: "Failed to init tables" }, { status: 500 });
   }
   const res = await AscellaContext.rest(
-    c.env.CLIENT_TOKEN,
-    `/applications/${c.env.CLIENT_ID}/commands`,
+    c.env!.CLIENT_TOKEN,
+    `/applications/${c.env!.CLIENT_ID}/commands`,
     {
       method: "PUT",
       body: commands,
