@@ -6,15 +6,16 @@
   "module": "./dist/index.mjs",
   "scripts": {
     "build": "node build.js",
+    "deploy": "wrangler publish",
     "dev": "miniflare --live-reload --debug --modules dist/index.mjs",
     "dev:remote": "wrangler dev",
-    "types:check": "tsc && tsc -p test/tsconfig.json",
-    "deploy": "wrangler publish",
-    "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
+    "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js",
+    "types:check": "tsc && tsc -p test/tsconfig.json"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "packageManager": "pnpm@7.12.2",
   "workspaces": [
     ".",
     "ascella-embeds/",
@@ -25,19 +26,23 @@
     "@cloudflare/workers-types": "^3.16.0",
     "@miniflare/d1": "^2.9.0",
     "@miniflare/shared": "^2.9.0",
-    "@moonrepo/cli": "^0.14.1",
+    "@moonrepo/cli": "^0.15.0",
+    "@sinclair/typebox": "^0.24.44",
     "@types/mime-types": "^2.1.1",
     "common": "workspace:./common",
-    "d1-orm": "^0.2.2",
+    "d1-orm": "^0.5.0",
     "discord-interactions": "^3.2.0",
     "discordeno": "^16.0.1",
-    "esbuild": "^0.15.9",
-    "hono": "^2.2.1",
+    "esbuild": "^0.15.10",
+    "hono": "^2.2.3",
     "mime-types": "^2.1.35",
     "miniflare": "^2.9.0",
     "prettier": "^2.7.1",
-    "typescript": "^4.8.3",
+    "typescript": "^4.8.4",
     "ulid-workers": "^2.0.0",
-    "wrangler": "^2.1.6"
+    "wrangler": "^2.1.9"
+  },
+  "engines": {
+    "node": "16.16.0"
   }
 }

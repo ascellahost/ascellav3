@@ -9,6 +9,7 @@ import { AscellaContext, commands, handleCommand } from "./commands/mod";
 import { Styles, UploadLimits } from "common/build/main";
 import { getHeaderDefaults, stringInject } from "./utils";
 import { getOrm } from "./orm";
+import { Value } from "@sinclair/typebox/value";
 
 export const api = new Hono<{ Bindings: Bindings }>();
 
@@ -125,6 +126,73 @@ api.get("/reviews.json", async (c) => {
     },
   );
 });
+
+// import { Static, Type } from "@sinclair/typebox";
+
+// const SignUp = Type.Object({
+//   email: Type.RegEx(
+//     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
+//   ),
+//   name: Type.String({ minLength: 3, maxLength: 32 }),
+//   password: Type.String({ minLength: 8, maxLength: 128 }),
+//   "cf-turnstile-response": Type.String(),
+// });
+
+// api.post("/signup", async (c) => {
+//   const [_, { users }] = getOrm(c.env.__D1_BETA__);
+
+//   const body = Object.fromEntries((await c.req.formData()).entries()) as Record<
+//     string,
+//     string
+//   >;
+
+//   console.log(body);
+
+//   if (!Value.Check(SignUp, body)) {
+//     return badRequest();
+//   }
+//   // Turnstile injects a token in "cf-turnstile-response".
+//   const token = body["cf-turnstile-response"];
+//   const ip = c.req.headers.get("CF-Connecting-IP") as string;
+
+//   let exists = await users.First({
+//     where: {
+//       email: body.email,
+//     },
+//   });
+//   if (exists) return badRequest("Email already exists");
+//   // verify the captcha token
+//   if (c.env.CLOUDFLARE_SECRET) {
+//     // Validate the token by calling the "/siteverify" API endpoint.
+//     let formData = new FormData();
+
+//     formData.append("secret", c.env.CLOUDFLARE_SECRET);
+//     formData.append("response", token);
+//     formData.append("remoteip", ip);
+
+//     const result = await fetch(
+//       "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+//       {
+//         body: formData,
+//         method: "POST",
+//       },
+//     );
+
+//     const outcome = await result.json() as { success: boolean };
+//     if (!outcome.success) {
+//       return badRequest("Invalid captcha");
+//     }
+//   }
+//   //TODO add email verification
+//   const user = await users.InsertOne({
+//     name: body.name,
+//     email: body.email,
+//     uuid: crypto.randomUUID(),
+//     token: genVanity(Styles.default, 20),
+//     upload_limit: UploadLimits.User,
+//   });
+// });
+
 api.post("/upload", async (c) => {
   if (await c.env.ASCELLA_KV.get("shutdown") == "true") {
     return badRequest("Ascella is currently shutdown");
@@ -149,7 +217,7 @@ api.post("/upload", async (c) => {
   } catch {
     return badRequest("Invalid form data");
   }
-  let file = form.get("file");
+  let file = form.get("file") as File;
 
   if (file instanceof File) {
     const [_, { files: fOrm }] = getOrm(c.env.__D1_BETA__);

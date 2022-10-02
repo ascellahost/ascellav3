@@ -3,3 +3,5 @@ packages:
   - ascella-embeds
   - ascella-web
   - common
+
+ignore-workspace-root-check: true

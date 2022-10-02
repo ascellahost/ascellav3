@@ -24,5 +24,6 @@ command = "node build.js"
 kv_persist = true
 cache_persist = true
 durable_objects_persist = true
+d1_persist = true
 env_path=".env"
 # r2_persist = "./data/"

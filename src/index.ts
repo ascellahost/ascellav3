@@ -6,9 +6,12 @@ import { verifyKey } from "discord-interactions";
 import type { DiscordInteraction } from "discordeno/types";
 import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
-import api from "./api";
 import { Styles } from "common/build/main";
 import { initTables } from "./orm";
+
+import api from "./api";
+import oath from "./oath";
+
 export const app = new Hono<{ Bindings: Bindings }>();
 
 app.notFound(async (c) => Response.json(notFound()));
@@ -97,5 +100,5 @@ app.post("/discord", async (c) => {
 });
 
 app.route("/api/v3", api);
-
+app.route("/oath", oath);
 export default app;

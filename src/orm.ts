@@ -4,7 +4,7 @@ import { Domain, File, Review, User } from "common/build/main";
 
 export function getOrm(db: D1Database) {
   const orm = new D1Orm(db);
-  const users = new Model<User>(
+  const users = new Model(
     {
       D1Orm: orm,
       tableName: "users",
@@ -46,7 +46,7 @@ export function getOrm(db: D1Database) {
       },
     },
   );
-  const domains = new Model<Domain>(
+  const domains = new Model(
     {
       D1Orm: orm,
       tableName: "domains",
@@ -79,7 +79,7 @@ export function getOrm(db: D1Database) {
       },
     },
   );
-  const files = new Model<File>(
+  const files = new Model(
     {
       D1Orm: orm,
       tableName: "files",
@@ -118,7 +118,7 @@ export function getOrm(db: D1Database) {
       },
     },
   );
-  const reviews = new Model<Review>({
+  const reviews = new Model({
     D1Orm: orm,
     tableName: "reviews",
   }, {

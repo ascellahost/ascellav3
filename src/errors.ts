@@ -36,3 +36,6 @@ export const rateLimitReached = (timeLeft: number) => {
     { status: 429 },
   );
 };
+export const serverError = (message: string) => {
+  return Response.json(basicData(500, message), { status: 500 });
+};

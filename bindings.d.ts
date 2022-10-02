@@ -8,4 +8,6 @@ interface Bindings {
   CLIENT_SECRET: string;
   CLIENT_PUB: string;
   CLIENT_TOKEN: string;
+  CLOUDFLARE_SECRET: string;
+  HOST: string;
 }
