@@ -9,7 +9,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "esbuild": "^0.17.17",
     "hono": "^3.1.6",

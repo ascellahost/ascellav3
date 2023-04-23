@@ -12,7 +12,6 @@
   },
   "keywords": [],
   "author": "Tricked <tricked@tricked.dev>",
-  "license": "MIT",
   "packageManager": "pnpm@7.12.2",
   "workspaces": [
     ".",

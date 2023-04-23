@@ -6,7 +6,6 @@
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
   "repository": "https://github.com/Tricked-dev/common",
-  "license": "MIT",
   "keywords": [],
   "scripts": {
     "build": "pnpm build:main && pnpm build:module",
