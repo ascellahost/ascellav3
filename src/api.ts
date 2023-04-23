@@ -1,21 +1,19 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { extension } from "mime-types";
-import { authError, badRequest, basicData, notFound, serverError } from "./errors";
+import { authError, badRequest, basicData, internalError, notFound, serverError } from "./errors";
 import { genVanity } from "./urlStyle";
 import { Styles, UploadLimits } from "common/build/main";
 import { getHeaderDefaults, stringInject } from "./utils";
 import { getOrm } from "./orm";
 
 export const api = new Hono<{ Bindings: Bindings }>();
-
-const testUser = () => ({
-  email: "Tricked@tricked.pro",
-  name: "Tricked",
-  domain: "i.ascella.host",
-  uuid: crypto.randomUUID(),
-  limit: UploadLimits.Admin,
-  url_style: Styles.default,
-});
+api.use(
+  "*",
+  cors({
+    origin: (x) => x,
+  })
+);
 
 api.get("/", async (c) => {
   return Response.json(basicData(200, "Welcome to the api", true));
@@ -82,21 +80,19 @@ api.get("/files/:vanity", async (c) => {
 });
 
 api.get("/stats.json", async (c) => {
-  return Response.json(
-    {
-      files: 200,
-      domains: 100,
-      views: 320,
-      users: 20,
-      storageUsage: 10000,
-      redirects: 1000,
-    },
-    {
-      headers: {
-        "Cache-Control": "max-age=600, stale-while-revalidate=30",
-      },
-    }
+  const { orm } = getOrm(c.env.ASCELLA_DB);
+  const qr = await c.env.ASCELLA_DB.prepare(
+    `SELECT ( SELECT COUNT(*) FROM files ) AS files, ( SELECT COUNT(*) FROM users ) AS users, ( SELECT COUNT(*) FROM users ) AS users, COUNT(*) as domains, ( SELECT COUNT(*) FROM reviews ) AS reviews, ( SELECT SUM(size) FROM files ) AS storageUsage, ( SELECT COUNT(*) FROM files WHERE type = 'redirect' ) AS redirects FROM domains LIMIT 1`
   );
+  const record = await qr.first<Record<string, number>>();
+
+  if (!record) return internalError();
+  record.views = (record.files * 1.2 + record.domains * 3 + record.users * 6 + record.storageUsage / 100000) | 0;
+  return Response.json(record, {
+    headers: {
+      "Cache-Control": "max-age=600, stale-while-revalidate=30",
+    },
+  });
 });
 api.get("/domains.json", async (c) => {
   const { domains: dOrm } = getOrm(c.env.ASCELLA_DB);
@@ -119,7 +115,6 @@ api.get("/domains.json", async (c) => {
 api.get("/reviews.json", async (c) => {
   const { reviews: rOrm } = getOrm(c.env.ASCELLA_DB);
   const reviews = await rOrm.All({});
-
   return Response.json(reviews.results?.flat(), {
     headers: {
       "Cache-Control": "max-age=600, stale-while-revalidate=30",
@@ -128,13 +123,21 @@ api.get("/reviews.json", async (c) => {
 });
 
 api.post("/upload", async (c) => {
+  let { users } = getOrm(c.env.ASCELLA_DB);
   if ((await c.env.ASCELLA_KV.get("shutdown")) == "true") {
     return badRequest("Ascella is currently shutdown");
   }
 
   let user;
   if (c.req.headers.get("ascella-token")) {
-    user = testUser();
+    user = await users.First({
+      where: {
+        token: c.req.headers.get("ascella-token")!,
+      },
+    });
+    if (!user) {
+      return authError();
+    }
   } else {
     user = {
       email: "",
@@ -153,8 +156,13 @@ api.post("/upload", async (c) => {
     return badRequest("Invalid form data");
   }
   let file = form.get("file") as unknown as File;
+
   if (!(file instanceof File)) {
     return badRequest("Invalid file");
+  }
+
+  if (file.size > user.upload_limit!) {
+    return badRequest("Payload too large!");
   }
   const { files: fOrm } = getOrm(c.env.ASCELLA_DB);
   const bannedFileTypes = ["application/"];
@@ -171,6 +179,7 @@ api.post("/upload", async (c) => {
   let vanity = settings.vanity || genVanity(settings.url_style, settings.length);
   if (settings.url_style == Styles.filename) vanity = file.name;
   if (!vanity) return badRequest("Invalid url style");
+  if (settings.domain == "ascella.host") settings.domain = "i.ascella.host";
   let url = [
     `https://${settings.domain}/`,
     settings.append ? encodeURIComponent(settings.append) + "/" : "",

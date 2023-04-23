@@ -10,14 +10,29 @@ This is Ascella but fully rewritten to work with the Cloudflare ecosystem
 
 ## Developing
 
-Create a .env file with the following contents (available on the discord dashboard):
+Create a env.json
 
-```env
-# .env
-CLIENT_ID=
-CLIENT_PUB=
-CLIENT_SECRET=
-CLIENT_TOKEN=
+```json
+{
+  "default": {
+    "CLIENT_ID": "",
+    "CLIENT_PUB": "",
+    "CLIENT_SECRET": "",
+    "CLIENT_TOKEN": "",
+    "SENTRY_DSN": "",
+    "DEBUG": false
+  },
+  "development": {
+    "APP_URL": "http://127.0.0.1:8787",
+    "DEBUG": true
+  },
+  "staging": {
+    "APP_URL": "https://staging.ascella.host"
+  },
+  "production": {
+    "APP_URL": "https://api.ascella.host"
+  }
+}
 ```
 
 ### Creating the tables

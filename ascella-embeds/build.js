@@ -19,6 +19,7 @@ try {
     outExtension: { ".js": ".mjs" },
     minifySyntax: true,
     minify: true,
+    charset: "utf8",
   });
   await rename(path.join(__dirname, "dist", "index.mjs"), path.join(__dirname, "dist", "_worker.js"));
 } catch (e) {

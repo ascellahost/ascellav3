@@ -25,6 +25,7 @@
       const headers = {
         "ascella-autodelete": config.days.toString(),
         "ascella-style": config.style,
+        "ascella-token": config.token,
         "ascella-domain": `${config.subDomain ? `${config.subDomain}.` : ""}${config.domain}`,
         ...Object.fromEntries(
           Object.entries(config.embed)
@@ -39,7 +40,7 @@
         DestinationType: "ImageUploader",
         RequestMethod: "POST",
         RequestURL: "https://api.ascella.host/api/v3/upload",
-        Headers: headers,
+        Headers: Object.fromEntries(Object.entries(headers).filter((x) => x[1] !== "")),
         Body: "MultipartFormData",
         FileFormName: "file",
         URL: "{json:url}",
@@ -56,7 +57,7 @@
       window.URL.revokeObjectURL(url);
     }}
   >
-    <div class="form-control w-full col-span-4">
+    <div class="form-control w-full col-span-2">
       <marquee direction="right" scrolldelay="2" scrollamount="2">
         <label>Select Domain</label>
       </marquee>
@@ -71,7 +72,18 @@
         </select>
       </div>
     </div>
-
+    <div class="form-control w-full my-2 col-span-2">
+      <label class="animate-pulse">Ascella token</label>
+      <p>
+        A ascella token allows you to upload bigger files & keep a history of files you can obtain one from <a
+          href="https://api.ascella.host/oauth/auth"
+          class="link link-primary link-hover"
+        >
+          here
+        </a> make sure to save it cause it regenerates each time you login
+      </p>
+      <input bind:value={config.token} placeholder="ascella-token" class="input input-accent rounded-sm focus:translate-x-4" />
+    </div>
     <div class="form-control w-full col-span-2">
       <p>Auto Delete Image days {config.days}</p>
       <input bind:value={config.days} type="range" min="1" max="365" class="range range-secondary hover:range-primary duration-500" />

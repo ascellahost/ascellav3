@@ -68,6 +68,9 @@ importers:
 
   ascella-web:
     dependencies:
+      '@astrojs/cloudflare':
+        specifier: ^6.2.2
+        version: 6.2.2(astro@2.3.0)
       '@astrojs/svelte':
         specifier: ^2.1.0
         version: 2.1.0(astro@2.3.0)(svelte@3.58.0)(typescript@4.9.5)(vite@4.3.1)
@@ -119,6 +122,16 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
+    dev: false
+
+  /@astrojs/cloudflare@6.2.2(astro@2.3.0):
+    resolution: {integrity: sha512-Z/twtIM68TwazHGLax05WcADsR6oDVFiq21TMTfEsWOmhoVzTTPwxiU8kw8gukGrwug8JwLiiAeK7qFDZNmFcw==}
+    peerDependencies:
+      astro: ^2.1.4
+    dependencies:
+      astro: 2.3.0
+      esbuild: 0.17.17
+      tiny-glob: 0.2.9
     dev: false
 
   /@astrojs/compiler@0.31.4:

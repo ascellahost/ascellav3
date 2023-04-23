@@ -1,0 +1,8 @@
+---
+let image = Astro.params.image as string;
+let result = await fetch(`https://api.ascella.host/api/v3/files/${image}`).then((r) => r.json());
+---
+
+<div class="flex justify-center max-w-full max-h-full">
+  <img src={result.raw} />
+</div>

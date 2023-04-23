@@ -40,14 +40,9 @@
       description: "Ascella is compatible with all major operating systems",
     },
   ];
-  const stats = {
-    files: 200,
-    domains: 100,
-    views: 320,
-    users: 20,
-    storageUsage: 10000,
-    redirects: 1000,
-  };
+
+  export let stats: Record<string, number>;
+
   import File from "svelte-material-icons/File.svelte";
   import Domain from "svelte-material-icons/Domain.svelte";
   import Eye from "svelte-material-icons/Eye.svelte";
@@ -99,7 +94,7 @@
   <div>
     <h2 class="text-3xl font-bold">Stats</h2>
     <div class="flex">
-      {#each Object.entries(stats) as [key, value]}
+      {#each Object.entries(stats).filter((x) => statIconsAndRenames[x[0]]) as [key, value]}
         <div class="stat w-80 bg-base-200 p-4 border-2">
           <div class="flex">
             <h2 class="flex leading-none mb-2 gap-1">
@@ -111,10 +106,11 @@
             <p>
               {#if statIconsAndRenames[key][2] == true}
                 {new Intl.NumberFormat("en", {
-                  unit: "kilobyte",
+                  unit: "megabyte",
                   style: "unit",
                   unitDisplay: "short",
-                }).format(value)}
+                  notation: "compact",
+                }).format((value / 1000000) | 0)}
               {:else}
                 {new Intl.NumberFormat("en", {
                   notation: "compact",

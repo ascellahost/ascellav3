@@ -1,5 +1,7 @@
 ---
 import Main from "../components/main.svelte";
+
+let stats = await fetch("https://api.ascella.host/api/v3/stats.json").then((r) => r.json());
 ---
 
 <html lang="en">
@@ -11,6 +13,16 @@ import Main from "../components/main.svelte";
     <title>Ascella.host</title>
   </head>
   <body>
-    <Main />
+    <Main {stats} />
+    <footer class="mt-2 max-w-[70rem] mx-auto">
+      <ul>
+        <li>
+          <a class="link link-hover link-primary" href="https://discord.gg/BDxd9AuHpr">Discord</a>
+        </li>
+        <li>
+          <a class="link link-hover link-primary" href="https://github.com/ascellahost/ascellav3">Github</a>
+        </li>
+      </ul>
+    </footer>
   </body>
 </html>

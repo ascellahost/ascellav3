@@ -1,22 +1,27 @@
 import { Hono } from "hono";
-import { serverError } from "./errors";
+import { internalError, serverError } from "./errors";
+import { getOrm } from "./orm";
+import { genVanity } from "./urlStyle";
+import { UploadLimits } from "common/src";
 
-export const oath = new Hono<{ Bindings: Bindings }>();
+export const oauth = new Hono<{ Bindings: Bindings }>();
 
-const callback = (host: string) => `${host}/oauth/callback`;
+const callback = (host: string) => `https://${host}/oauth/callback`;
 
 const generateDiscordAuthUrl = (host: string, clientId: string) => {
   const BASE_INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${clientId}` as const;
   return `${BASE_INVITE_URL}&redirect_uri=${encodeURIComponent(callback(host))}&response_type=code&scope=identify` as const;
 };
 
-oath.get("/auth", async (c) => {
+oauth.get("/auth", async (c) => {
   let host = new URL(APP_URL).host;
   const invite = generateDiscordAuthUrl(host, CLIENT_ID);
   return Response.redirect(invite, 302);
 });
 
-oath.get("/callback", async (c) => {
+oauth.get("/callback", async (c) => {
+  let { users } = getOrm(c.env.ASCELLA_DB);
+
   let host = new URL(APP_URL).host;
 
   const url = new URL(c.req.url);
@@ -50,21 +55,58 @@ oath.get("/callback", async (c) => {
     return Response.redirect("/", 302);
   }
 
-  // redirect user to front page with cookies set
-  const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
-  const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-  console.log("redirect to / with cookies");
-  return new Response(undefined, {
+  let result: Record<string, string> = await fetch("https://discordapp.com/api/users/@me", {
     headers: {
-      "Set-Cookie": [
-        `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-        `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-      ].join(","),
-      Location: "/",
+      Authorization: `Bearer ${response.access_token}`,
+    },
+  }).then((r) => r.json());
+  let id = result.id;
+  if (!id) return internalError();
+  let user = await users.First({
+    where: {
+      email: `${id}@disco`,
     },
   });
+  if (!user) {
+    await users.InsertOne({
+      domain: "i.ascella.host",
+      email: `${id}@disco`,
+      name: result.name || genVanity(1),
+      token: genVanity(1, 12),
+      uuid: genVanity(2),
+      upload_limit: UploadLimits.User,
+    });
+    user = await users.First({
+      where: {
+        email: `${id}@disco`,
+      },
+    });
+  } else {
+    user.token = genVanity(1, 12);
+    await users.Update({
+      where: {
+        email: `${id}@disco`,
+      },
+      data: {
+        token: user.token,
+      },
+    });
+  }
+
+  // redirect user to front page with cookies set
+  // const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
+  // const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+  // console.log("redirect to / with cookies");
+  return new Response(`your Ascella access token is ${user?.token}`, {
+    // headers: {
+    //   "Set-Cookie": [
+    //     `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
+    //     `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
+    //   ].join(","),
+    // },
+  });
 });
-oath.get("/refresh", async (c) => {
+oauth.get("/refresh", async (c) => {
   let host = new URL(APP_URL).host;
 
   const url = new URL(c.req.url);
@@ -81,7 +123,7 @@ oath.get("/refresh", async (c) => {
     redirect_uri: callback(host),
     grant_type: "refresh_token",
     refresh_token: disco_refresh_token,
-    scope: "identify guilds",
+    scope: "identify",
   };
 
   // performing a Fetch request to Discord's token endpoint
@@ -101,18 +143,23 @@ oath.get("/refresh", async (c) => {
   const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
   const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   console.log("set refreshed cookies");
+  let result: Record<string, string> = await fetch("https://discordapp.com/api/users/@me", {
+    headers: {
+      Authorization: `Bearer ${response.access_token}`,
+    },
+  }).then((r) => r.json());
+  let id = result.id;
 
-  return new Response(JSON.stringify({ disco_access_token: response.access_token }), {
+  return new Response(JSON.stringify({}), {
     headers: {
       "Set-Cookie": [
         `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
         `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
       ].join(","),
-      Location: "/",
     },
   });
 });
-oath.get("/signout", async (c) => {
+oauth.get("/signout", async (c) => {
   return new Response(undefined, {
     headers: {
       "Set-Cookie": [`disco_access_token=deleted; Path=/; Max-Age=-1`, `disco_refresh_token=deleted; Path=/; Max-Age=-1`].join(","),
@@ -120,4 +167,4 @@ oath.get("/signout", async (c) => {
     },
   });
 });
-export default oath;
+export default oauth;
