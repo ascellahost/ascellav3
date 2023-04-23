@@ -1,24 +1,10 @@
 import { AscellaContext, createOption } from "./mod";
-import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
-import {
-  ApplicationCommandFlags,
-  ApplicationCommandOptionTypes,
-  ApplicationCommandTypes,
-  InteractionResponseTypes,
-  InteractionTypes,
-} from "discordeno/types";
-import { getOrm, initTables } from "@/orm";
+import { ApplicationCommandOptionTypes } from "discordeno/types";
+import { initTables } from "@/orm";
 export default {
   name: "update-tables",
-  "description": "Updates the tables",
-  "options": [
-    createOption(
-      "force",
-      "force set the tables",
-      ApplicationCommandOptionTypes.Boolean,
-      false,
-    ),
-  ],
+  description: "Updates the tables",
+  options: [createOption("force", "force set the tables", ApplicationCommandOptionTypes.Boolean, false)],
   async exec(ctx: AscellaContext) {
     const force = ctx.getValue<boolean>("force", false) ? "force" : "default";
     try {

@@ -2,12 +2,8 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "types": [
-      "@cloudflare/workers-types"
-    ],
+    "lib": ["esnext"],
+    "types": ["@cloudflare/workers-types"],
     "moduleResolution": "node",
     "strict": true,
     "noEmit": true,
@@ -15,18 +11,11 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "path": [
-        "./path.js"
-      ]
+      "@/*": ["src/*"],
+      "path": ["./path.js"]
     }
   },
-  "include": [
-    "src/**/*",
-    "bindings.d.ts"
-  ],
+  "include": ["src/**/*", "bindings.d.ts"],
   "references": [
     {
       "path": "."

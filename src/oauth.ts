@@ -1,42 +1,24 @@
-import { Context, Hono } from "hono";
-import { extension } from "mime-types";
-import {
-  authError,
-  badRequest,
-  basicData,
-  notFound,
-  serverError,
-} from "./errors";
-import { genVanity } from "./urlStyle";
-import { verifyKey } from "discord-interactions";
-import type { DiscordInteraction } from "discordeno/types";
-import { InteractionTypes } from "discordeno/types";
-import { AscellaContext, commands, handleCommand } from "./commands/mod";
-import { Styles, UploadLimits } from "common/build/main";
-import { getHeaderDefaults, stringInject } from "./utils";
-import { getOrm } from "./orm";
-import { Value } from "@sinclair/typebox/value";
+import { Hono } from "hono";
+import { serverError } from "./errors";
 
 export const oath = new Hono<{ Bindings: Bindings }>();
 
-const callback = (host: string) => `${host}/api/discord/callback`;
+const callback = (host: string) => `${host}/oauth/callback`;
 
 const generateDiscordAuthUrl = (host: string, clientId: string) => {
-  const BASE_INVITE_URL =
-    `https://discord.com/oauth2/authorize?client_id=${clientId}` as const;
-  return (
-    `${BASE_INVITE_URL}&redirect_uri=${
-      encodeURIComponent(callback(host))
-    }&response_type=code&scope=identify` as const
-  );
+  const BASE_INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${clientId}` as const;
+  return `${BASE_INVITE_URL}&redirect_uri=${encodeURIComponent(callback(host))}&response_type=code&scope=identify` as const;
 };
 
 oath.get("/auth", async (c) => {
-  const invite = generateDiscordAuthUrl(c.env.HOST, c.env.CLIENT_ID);
+  let host = new URL(APP_URL).host;
+  const invite = generateDiscordAuthUrl(host, CLIENT_ID);
   return Response.redirect(invite, 302);
 });
 
 oath.get("/callback", async (c) => {
+  let host = new URL(APP_URL).host;
+
   const url = new URL(c.req.url);
   // fetch returnCode set in the URL parameters.
   const returnCode = url.searchParams.get("code")!;
@@ -45,10 +27,10 @@ oath.get("/callback", async (c) => {
   // initializing data object to be pushed to Discord's token endpoint.
   // the endpoint returns access & refresh tokens for the user.
   const dataObject = {
-    client_id: c.env.CLIENT_ID,
-    client_secret: c.env.CLIENT_SECRET,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
     grant_type: "authorization_code",
-    redirect_uri: callback(c.env.HOST),
+    redirect_uri: callback(host),
     code: returnCode,
     scope: "identify",
   };
@@ -70,9 +52,7 @@ oath.get("/callback", async (c) => {
 
   // redirect user to front page with cookies set
   const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
-  const refresh_token_expires_in = new Date(
-    Date.now() + 30 * 24 * 60 * 60 * 1000,
-  ); // 30 days
+  const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   console.log("redirect to / with cookies");
   return new Response(undefined, {
     headers: {
@@ -80,11 +60,13 @@ oath.get("/callback", async (c) => {
         `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
         `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
       ].join(","),
-      "Location": "/",
+      Location: "/",
     },
   });
 });
 oath.get("/refresh", async (c) => {
+  let host = new URL(APP_URL).host;
+
   const url = new URL(c.req.url);
   const disco_refresh_token = url.searchParams.get("code");
   if (!disco_refresh_token) {
@@ -94,9 +76,9 @@ oath.get("/refresh", async (c) => {
   // initializing data object to be pushed to Discord's token endpoint.
   // quite similar to what we set up in callback.js, expect with different grant_type.
   const dataObject = {
-    client_id: c.env.CLIENT_ID,
-    client_secret: c.env.CLIENT_SECRET,
-    redirect_uri: callback(c.env.HOST),
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    redirect_uri: callback(host),
     grant_type: "refresh_token",
     refresh_token: disco_refresh_token,
     scope: "identify guilds",
@@ -117,32 +99,24 @@ oath.get("/refresh", async (c) => {
 
   // redirect user to front page with cookies set
   const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
-  const refresh_token_expires_in = new Date(
-    Date.now() + 30 * 24 * 60 * 60 * 1000,
-  ); // 30 days
+  const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   console.log("set refreshed cookies");
 
-  return new Response(
-    JSON.stringify({ disco_access_token: response.access_token }),
-    {
-      headers: {
-        "Set-Cookie": [
-          `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-          `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-        ].join(","),
-        "Location": "/",
-      },
+  return new Response(JSON.stringify({ disco_access_token: response.access_token }), {
+    headers: {
+      "Set-Cookie": [
+        `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
+        `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
+      ].join(","),
+      Location: "/",
     },
-  );
+  });
 });
 oath.get("/signout", async (c) => {
   return new Response(undefined, {
     headers: {
-      "Set-Cookie": [
-        `disco_access_token=deleted; Path=/; Max-Age=-1`,
-        `disco_refresh_token=deleted; Path=/; Max-Age=-1`,
-      ].join(","),
-      "Location": "/",
+      "Set-Cookie": [`disco_access_token=deleted; Path=/; Max-Age=-1`, `disco_refresh_token=deleted; Path=/; Max-Age=-1`].join(","),
+      Location: "/",
     },
   });
 });

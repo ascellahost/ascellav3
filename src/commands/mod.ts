@@ -1,11 +1,5 @@
 import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
-import {
-  ApplicationCommandFlags,
-  ApplicationCommandOptionTypes,
-  ApplicationCommandTypes,
-  InteractionResponseTypes,
-  InteractionTypes,
-} from "discordeno/types";
+import { ApplicationCommandOptionTypes, InteractionResponseTypes } from "discordeno/types";
 import { Context } from "hono";
 
 import shutdown from "./shutdown";
@@ -19,7 +13,7 @@ export function createOption(
   name: string,
   description: string,
   type: ApplicationCommandOptionTypes = ApplicationCommandOptionTypes.String,
-  required = false,
+  required = false
 ) {
   return {
     name,
@@ -29,17 +23,17 @@ export function createOption(
   };
 }
 export class AscellaContext {
-  tables: ReturnType<typeof getOrm>[1];
-  orm: ReturnType<typeof getOrm>[0];
+  tables: ReturnType<typeof getOrm>;
+  orm: ReturnType<typeof getOrm>["orm"];
   constructor(
     private data: DiscordInteraction,
-    private context: Context<string, {
+    private context: Context<{
       Bindings: Bindings;
-    }>,
+    }>
   ) {
-    const orm = getOrm(this.context.env.__D1_BETA__);
-    this.orm = orm[0];
-    this.tables = orm[1];
+    const orm = getOrm(this.context.env.ASCELLA_DB);
+    this.orm = orm.orm;
+    this.tables = orm;
   }
   get name() {
     return this.data.data?.name;
@@ -54,14 +48,15 @@ export class AscellaContext {
     return this.data.data?.options;
   }
   get clientId() {
-    return this.context.env.CLIENT_ID;
+    return CLIENT_ID;
   }
   getValue<T>(name: string, required: false): T | undefined;
   getValue<T>(name: string, required: true): T;
   getValue<T>(name: string, required: boolean): T | undefined {
     let option = this.options?.find((x) => x.name === name);
     if (
-      !option || option.type == ApplicationCommandOptionTypes.SubCommand ||
+      !option ||
+      option.type == ApplicationCommandOptionTypes.SubCommand ||
       option.type == ApplicationCommandOptionTypes.SubCommandGroup
     ) {
       if (required) {
@@ -71,15 +66,7 @@ export class AscellaContext {
     }
     return option.value as T;
   }
-  send({
-    content,
-    embeds,
-    ephemeral,
-  }: {
-    content?: string;
-    embeds?: DiscordEmbed[];
-    ephemeral?: boolean;
-  }) {
+  send({ content, embeds, ephemeral }: { content?: string; embeds?: DiscordEmbed[]; ephemeral?: boolean }) {
     return this.context.json({
       type: InteractionResponseTypes.ChannelMessageWithSource,
       data: {
@@ -90,46 +77,29 @@ export class AscellaContext {
     });
   }
 
-  static async rest(
-    token: string,
-    endpoint: string,
-    options?: { body?: Record<string, any>; method?: string },
-  ) {
+  static async rest(token: string, endpoint: string, options?: { body?: Record<string, any>; method?: string }) {
     return await fetch(`https://discord.com/api/v10${endpoint}`, {
       method: options?.method || "POST",
       body: options?.body ? JSON.stringify(options?.body) : undefined,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bot ${token}`,
+        Authorization: `Bot ${token}`,
       },
     });
   }
 
-  async rest(
-    endpoint: string,
-    options?: { body?: Record<string, any>; method?: string },
-  ) {
-    return await AscellaContext.rest(
-      this.context.env.CLIENT_TOKEN,
-      endpoint,
-      options,
-    );
+  async rest(endpoint: string, options?: { body?: Record<string, any>; method?: string }) {
+    return await AscellaContext.rest(CLIENT_TOKEN, endpoint, options);
   }
 }
 
-export const commands = [
-  shutdown,
-  cmds,
-  updateTables,
-  addDomain,
-  review,
-] as const;
+export const commands = [shutdown, cmds, updateTables, addDomain, review] as const;
 
 export async function handleCommand(
   data: DiscordInteraction,
-  context: Context<string, {
+  context: Context<{
     Bindings: Bindings;
-  }>,
+  }>
 ) {
   let ctx = new AscellaContext(data, context);
   let command = commands.find((x) => x.name === ctx.name);
@@ -138,5 +108,5 @@ export async function handleCommand(
       content: `Unknown command ${ctx.name}`,
     });
   }
-  return command.exec(ctx);
+  return await command.exec(ctx);
 }

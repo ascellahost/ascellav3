@@ -1,15 +1,9 @@
-export const basicData = (
-  status: number,
-  message: string,
-  success = false,
-  opts?: Record<string, any>,
-) => {
+export const basicData = (status: number, message: string, success = false, opts?: Record<string, any>) => {
   return {
     status,
     message,
     success,
-    donate:
-      "Like ascella? consider supporting me on github https://github.com/sponsors/Tricked-dev/",
+    donate: "Like ascella? consider supporting me on github https://github.com/sponsors/Tricked-dev/",
     ...opts,
   };
 };
@@ -31,10 +25,7 @@ export const forbidden = () => {
   return Response.json(basicData(403, "Forbidden"), { status: 403 });
 };
 export const rateLimitReached = (timeLeft: number) => {
-  return Response.json(
-    basicData(429, `Rate limit reached. Try again in ${timeLeft} seconds`),
-    { status: 429 },
-  );
+  return Response.json(basicData(429, `Rate limit reached. Try again in ${timeLeft} seconds`), { status: 429 });
 };
 export const serverError = (message: string) => {
   return Response.json(basicData(500, message), { status: 500 });

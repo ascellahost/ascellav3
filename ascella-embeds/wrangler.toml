@@ -1,3 +1,13 @@
 name = "ascella-embeds"
-main = "src/index.ts"
+main = "src/index.tsx"
 compatibility_date = "2022-09-21"
+routes = [
+    "*.ascella.host/*",
+    "i.tricked.pro/*",
+    "*.is-a-huge.monster/*",
+    "is-a-huge.monster/*",
+    "i.tricked.dev/*",
+]
+
+[build]
+command = "node build.js"

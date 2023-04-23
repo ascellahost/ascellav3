@@ -1,0 +1,18 @@
+---
+import ConfigWizard from "../components/ConfigWizard.svelte";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Ascella.host</title>
+  </head>
+  <body>
+    <div class="max-w-[70rem] mx-auto">
+      <ConfigWizard client:only />
+    </div>
+  </body>
+</html>

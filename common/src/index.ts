@@ -52,7 +52,7 @@ export enum UploadLimits {
 export enum Styles {
   default = 1,
   uuid = 2,
-  zws = 3,
+  timestamp = 3,
   ulid = 4,
   emoji = 5,
   filename = 6,

@@ -1,29 +1,62 @@
-name = "ascella"
+name = "ascella-dev"
 main = "dist/index.mjs"
-compatibility_date = "2022-05-28"
+compatibility_date = "2023-04-22"
 compatibility_flags = []
-kv_namespaces = [
-  { binding = "ASCELLA_KV" },
-]
+route = "dev.ascella.host/*"
+vars = { ENVIRONMENT = "dev" }
+
+[env.staging]
+name = "ascella-staging"
+vars = { ENVIRONMENT = "staging" }
+route = "staging.ascella.host/*"
+build = { command = "node build.js staging" }
+
+[env.production]
+name = "ascella"
+vars = { ENVIRONMENT = "production" }
+route = "api.ascella.host/*"
+build = { command = "node build.js production" }
+
+[[env.staging.kv_namespaces]]
+binding = "ASCELLA_KV"
+id = "791ec09b5178468daebf5e3a67239cce"
+
+[[env.staging.r2_buckets]]
+binding = "ASCELLA_DATA"
+bucket_name = "ascella"
+
+[[env.staging.d1_databases]]
+binding = "ASCELLA_DB"
+database_name = "ascella"
+database_id = "b93587c3-9cd6-48a1-b06d-ac31cc9c7ec0"
+
+[[env.production.kv_namespaces]]
+binding = "ASCELLA_KV"
+id = "791ec09b5178468daebf5e3a67239cce"
+
+[[env.production.r2_buckets]]
+binding = "ASCELLA_DATA"
+bucket_name = "ascella"
+
+[[env.production.d1_databases]]
+binding = "ASCELLA_DB"
+database_name = "ascella"
+database_id = "b93587c3-9cd6-48a1-b06d-ac31cc9c7ec0"
+
+[[kv_namespaces]]
+binding = "ASCELLA_KV"
+id = "791ec09b5178468daebf5e3a67239cce"
+preview_id = "6c193a1af81543ebab5935d61adf0fa0"
 
 [[r2_buckets]]
 binding = "ASCELLA_DATA"
-bucket_name = "data"
+bucket_name = "ascella"
+preview_bucket_name = "cdn"
 
 [[d1_databases]]
-binding = "__D1_BETA__"
-bucket_name = "db"
-env_path = ".env.test"
-
-
+binding = "ASCELLA_DB"
+database_name = "ascella-dev"
+database_id = "c67e2914-648e-475b-97da-0723e0dad6c4"
 
 [build]
-command = "node build.js"
-
-[miniflare]
-kv_persist = true
-cache_persist = true
-durable_objects_persist = true
-d1_persist = true
-env_path=".env"
-# r2_persist = "./data/"
+command = "node build.js development"

@@ -1,41 +1,13 @@
 import { AscellaContext, createOption } from "./mod";
-import type { DiscordEmbed, DiscordInteraction } from "discordeno/types";
-import {
-  ApplicationCommandFlags,
-  ApplicationCommandOptionTypes,
-  ApplicationCommandTypes,
-  InteractionResponseTypes,
-  InteractionTypes,
-} from "discordeno/types";
-import { getOrm } from "@/orm";
+import { ApplicationCommandOptionTypes } from "discordeno/types";
 export default {
   name: "add-domain",
-  "description": "Add a new domain",
-  "options": [
-    createOption(
-      "domain",
-      "The domain to add",
-      ApplicationCommandOptionTypes.String,
-      true,
-    ),
-    createOption(
-      "official",
-      "Is this an official domain",
-      ApplicationCommandOptionTypes.Boolean,
-      false,
-    ),
-    createOption(
-      "apex",
-      "Is this an apex domain",
-      ApplicationCommandOptionTypes.Boolean,
-      false,
-    ),
-    createOption(
-      "private",
-      "Is this a private domain",
-      ApplicationCommandOptionTypes.String,
-      false,
-    ),
+  description: "Add a new domain",
+  options: [
+    createOption("domain", "The domain to add", ApplicationCommandOptionTypes.String, true),
+    createOption("official", "Is this an official domain", ApplicationCommandOptionTypes.Boolean, false),
+    createOption("apex", "Is this an apex domain", ApplicationCommandOptionTypes.Boolean, false),
+    createOption("private", "Is this a private domain", ApplicationCommandOptionTypes.String, false),
   ],
   async exec(ctx: AscellaContext) {
     const { domains } = ctx.tables;
@@ -45,13 +17,10 @@ export default {
     const priv = ctx.getValue<string>("private", false);
     try {
       await domains.InsertOne({
-        //@ts-expect-error - d1-orm types bug
-        data: {
-          domain,
-          official,
-          apex,
-          private: priv,
-        },
+        domain,
+        official,
+        apex,
+        private: priv,
       });
       return ctx.send({
         content: `Success`,

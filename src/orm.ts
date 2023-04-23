@@ -1,6 +1,5 @@
 import { D1Orm, DataTypes, Model } from "d1-orm";
 import { UploadLimits } from "common/build/main";
-import { Domain, File, Review, User } from "common/build/main";
 
 export function getOrm(db: D1Database) {
   const orm = new D1Orm(db);
@@ -8,6 +7,7 @@ export function getOrm(db: D1Database) {
     {
       D1Orm: orm,
       tableName: "users",
+      primaryKeys: "id",
     },
     {
       id: {
@@ -44,12 +44,13 @@ export function getOrm(db: D1Database) {
         notNull: true,
         defaultValue: UploadLimits.User,
       },
-    },
+    }
   );
   const domains = new Model(
     {
       D1Orm: orm,
       tableName: "domains",
+      primaryKeys: "id",
     },
     {
       id: {
@@ -77,12 +78,13 @@ export function getOrm(db: D1Database) {
         type: DataTypes.STRING,
         notNull: false,
       },
-    },
+    }
   );
   const files = new Model(
     {
       D1Orm: orm,
       tableName: "files",
+      primaryKeys: "id",
     },
     {
       id: {
@@ -116,37 +118,41 @@ export function getOrm(db: D1Database) {
         type: DataTypes.INTEGER,
         notNull: false,
       },
-    },
+    }
   );
-  const reviews = new Model({
-    D1Orm: orm,
-    tableName: "reviews",
-  }, {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      notNull: true,
+  const reviews = new Model(
+    {
+      D1Orm: orm,
+      tableName: "reviews",
+      primaryKeys: "id",
     },
-    name: {
-      type: DataTypes.STRING,
-      notNull: true,
-    },
-    avatar: {
-      type: DataTypes.STRING,
-      notNull: true,
-    },
-    comment: {
-      type: DataTypes.STRING,
-      notNull: true,
-    },
-  });
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        notNull: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        notNull: true,
+      },
+      avatar: {
+        type: DataTypes.STRING,
+        notNull: true,
+      },
+      comment: {
+        type: DataTypes.STRING,
+        notNull: true,
+      },
+    }
+  );
 
-  return [orm, { users, domains, files, reviews }] as const;
+  return { orm, users, domains, files, reviews } as const;
 }
 
 export async function initTables(db: D1Database, force: "default" | "force") {
-  const [orm, { users, domains, files, reviews }] = getOrm(db);
+  const { users, domains, files, reviews } = getOrm(db);
   await users.CreateTable({
     strategy: force,
   });
