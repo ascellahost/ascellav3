@@ -258,9 +258,9 @@ api.get("/me", async (c) => {
   return basicResponse(200, "Successfully checked token", true, { data });
 });
 
-api.get("/me/images", async (c) => {
-  let q = c.req.queries().page;
-  if (Array.isArray(q) || !q || isNaN(parseInt(q))) return badRequest("Invalid query");
+api.get("/me/files", async (c) => {
+  let q = c.req.query().page;
+  if (!q || isNaN(parseInt(q))) return badRequest("Invalid query");
   let page = parseInt(q);
 
   let { users, files } = getOrm(c.env.ASCELLA_DB);
