@@ -2,11 +2,21 @@
 
 This is Ascella but fully rewritten to work with the Cloudflare ecosystem
 
-## Status
+Here is a simple flow chart:
 
-- [x] Backend
-- [ ] Embed Service
-- [ ] Website
+```mermaid
+graph TD;
+    A[Website]-->|Embed info & stats|B;
+    C[Embed Service]-->|Embed info|B;
+    C-->|Redirects|A;
+    B{backend}-->|Storing images|Z(R2);
+    B-->|Storing All data|X(D1);
+    B-->|Checking status|V(KV);
+    B-->|Oauth2 and Bot|E;
+    E(Discord Api)-->|Interactions|B;
+```
+
+[Discord server](https://discord.gg/BDxd9AuHpr)
 
 ## Developing
 
@@ -33,15 +43,4 @@ Create a env.json
     "APP_URL": "https://api.ascella.host"
   }
 }
-```
-
-### Creating the tables
-
-Open `BACKEND_URL/discord?token=CLIENT_TOKEN` in your browser to create the tables and initialize the commands.
-
-### Running the backend
-
-```bash
-pnpm i
-pnpm dev
 ```

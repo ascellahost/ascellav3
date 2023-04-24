@@ -229,6 +229,7 @@ api.post("/upload", async (c) => {
     type: file.type,
     vanity: vanity,
     upload_name: file.name,
+    uploader: user.id,
   });
 
   return Response.json({

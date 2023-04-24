@@ -23,7 +23,7 @@ export function createOption(
   };
 }
 export class AscellaContext {
-  tables: ReturnType<typeof getOrm>;
+  tables: Exclude<ReturnType<typeof getOrm>, "orm">;
   orm: ReturnType<typeof getOrm>["orm"];
   constructor(
     private data: DiscordInteraction,
@@ -107,6 +107,9 @@ export async function handleCommand(
     return ctx.send({
       content: `Unknown command ${ctx.name}`,
     });
+  }
+  if (command.name !== "review") {
+    if (ctx.user!.id !== "336465356304678913") return ctx.send({ content: "Not enough perms!" });
   }
   return await command.exec(ctx);
 }
