@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { extension } from "mime-types";
-import { authError, badRequest, basicData, internalError, notFound, serverError } from "./errors";
+import { authError, badRequest, basicData, basicResponse, internalError, notFound, serverError } from "./errors";
 import { genVanity } from "./urlStyle";
 import { Styles, UploadLimits } from "common/build/main";
 import { getHeaderDefaults, stringInject } from "./utils";
 import { getOrm } from "./orm";
+import { validator } from "hono/validator";
 
 export const api = new Hono<{ Bindings: Bindings }>();
 api.use(
@@ -74,20 +75,20 @@ api.get("/files/:vanity", async (c) => {
 
   return Response.json({
     raw: `${APP_URL}/cdn/${loc}`,
+    date: meta.uploaded.toISOString(),
     views: 0,
     embed: meta.customMetadata,
   });
 });
 
 api.get("/stats.json", async (c) => {
-  const { orm } = getOrm(c.env.ASCELLA_DB);
-  const qr = await c.env.ASCELLA_DB.prepare(
+  const qr = c.env.ASCELLA_DB.prepare(
     `SELECT ( SELECT COUNT(*) FROM files ) AS files, ( SELECT COUNT(*) FROM users ) AS users, ( SELECT COUNT(*) FROM users ) AS users, COUNT(*) as domains, ( SELECT COUNT(*) FROM reviews ) AS reviews, ( SELECT SUM(size) FROM files ) AS storageUsage, ( SELECT COUNT(*) FROM files WHERE type = 'redirect' ) AS redirects FROM domains LIMIT 1`
   );
   const record = await qr.first<Record<string, number>>();
 
   if (!record) return internalError();
-  record.views = (record.files * 1.2 + record.domains * 3 + record.users * 6 + record.storageUsage / 100000) | 0;
+  record.views = (record.files * 1.2 + record.domains * 3 + record.users * 6 + record.storageUsage / 300000) | 0;
   return Response.json(record, {
     headers: {
       "Cache-Control": "max-age=600, stale-while-revalidate=30",
@@ -242,6 +243,62 @@ api.post("/upload", async (c) => {
     vanity: vanity,
     url,
   });
+});
+
+api.get("/me", async (c) => {
+  let { users } = getOrm(c.env.ASCELLA_DB);
+  const token = c.req.headers.get("ascella-token");
+  if (!token) return authError("ascella-token header missing");
+  const data = await users.First({
+    where: {
+      token: token,
+    },
+  });
+  if (!data) return authError("Invalid token");
+  return basicResponse(200, "Successfully checked token", true, { data });
+});
+
+api.get("/me/images", async (c) => {
+  let q = c.req.queries().page;
+  if (Array.isArray(q) || !q || isNaN(parseInt(q))) return badRequest("Invalid query");
+  let page = parseInt(q);
+
+  let { users, files } = getOrm(c.env.ASCELLA_DB);
+  const token = c.req.headers.get("ascella-token");
+  if (!token) return authError("ascella-token header missing");
+  const data = await users.First({
+    where: {
+      token: token,
+    },
+  });
+  const perPage = 20;
+  if (!data) return authError("Invalid token");
+
+  const images = await files.All({
+    where: {
+      uploader: data.id,
+    },
+    limit: perPage,
+    offset: perPage * page,
+    orderBy: "id",
+  });
+  const loc = `${APP_URL}/cdn/${data.id}/`;
+
+  let result = images.results?.map((x) => ({
+    name: x.upload_name,
+    vanity: x.vanity,
+    raw: `${loc}${x.name}`,
+  }));
+  if (!result) return internalError();
+  return basicResponse(
+    200,
+    "Retrieved images",
+    true,
+    { data: result }
+    //{
+    // "ascella-image-count":  TODO
+    //}
+  );
 });
 
 export default api;

@@ -1,14 +1,31 @@
-export const basicData = (status: number, message: string, success = false, opts?: Record<string, any>) => {
+export const basicData = (status: number, message: string, success?: boolean, opts?: Record<string, any>) => {
+  if (success == undefined) {
+    success = status > 200 && status < 299;
+  }
   return {
     status,
     message,
     success,
     donate: "Like ascella? consider supporting me on github https://github.com/sponsors/Tricked-dev/",
     ...opts,
-  };
+  } as const;
 };
-export const authError = () => {
-  return Response.json(basicData(401, "Unauthorized"), { status: 401 });
+export const basicResponse = (...args: [...data: Parameters<typeof basicData>, headers?: Record<string, any>]): Response => {
+  let headers = {};
+  if (args.length == 5) {
+    headers = args.pop() as Record<string, any>;
+  }
+  const content = basicData(...(args as unknown as Parameters<typeof basicData>));
+  return Response.json(content, {
+    status: content.status,
+    headers: {
+      "content-type": "application/json",
+      ...headers,
+    },
+  });
+};
+export const authError = (msg?: string) => {
+  return Response.json(basicData(401, msg ?? "Unauthorized"), { status: 401 });
 };
 export const notFound = () => {
   return Response.json(basicData(404, "Not Found"), { status: 404 });
