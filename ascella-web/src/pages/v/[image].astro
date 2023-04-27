@@ -1,7 +1,30 @@
 ---
 let image = Astro.params.image as string;
 let result = await fetch(`https://api.ascella.host/api/v3/files/${image}`).then((r) => r.json());
+
+const { embed } = result;
+const meta = [
+  ["og:title", embed.title],
+  ["description", embed.description],
+  ["og:description", embed.description],
+  ["color", embed.color],
+  ["theme-color", embed.color],
+  ["og:site_name", embed.sitename],
+  ["og:site_name-url", embed.sitenameUrl],
+  ["og:author", embed.author],
+  ["og:author-url", embed.authorUrl],
+  ["og:image", result.raw],
+  ["twitter:image:src", result.raw],
+  ["twitter:card", "summary_large_image"],
+  ["viewport", "width=device-width, initial-scale=1"],
+]
+  .filter(([, value]) => value)
+  // this is sanitized on the backend.
+  .map(([name, content]) => `<meta name="${name}" content="${content}">`)
+  .join("");
 ---
+
+<head set:html={meta} />
 
 <div class="flex justify-center max-w-full max-h-full">
   <img src={result.raw} />

@@ -71,7 +71,7 @@ oauth.get("/callback", async (c) => {
     await users.InsertOne({
       domain: "i.ascella.host",
       email: `${id}@disco`,
-      name: result.name || genVanity(1),
+      name: result.username || genVanity(1),
       token: genVanity(1, 12),
       uuid: genVanity(2),
       upload_limit: UploadLimits.User,

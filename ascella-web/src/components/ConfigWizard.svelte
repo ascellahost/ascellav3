@@ -66,7 +66,7 @@
         <select bind:value={config.domain} class="select select-primary rounded-sm" required>
           {#await domains then domains}
             {#each domains as domain}
-              <option>{domain.domain}</option>
+              <option selected>{domain.domain}</option>
             {/each}
           {/await}
         </select>
@@ -144,9 +144,22 @@
       <label class="animate-pulse">Embed Author URL</label>
       <input bind:value={config.embed["author-url"]} placeholder="author-url" class="input input-accent rounded-sm focus:translate-y-2" />
     </div>
+    <div class="form-control w-full my-2 flex">
+      <label class="cursor-pointer label">
+        <input type="checkbox" class="checkbox checkbox-error" />
+        <span class="label-text"> <a href="/rules">I accept the ascella rules</a></span>
+      </label>
+    </div>
     <button type="submit" class="btn btn-primary col-span-4">
       <span class="animate-ping"><DL /></span>
-      Download</button
-    >
+      <span> Download </span>
+    </button>
+    <p class="col-span-2">
+      On linux or mac without sharex? no problem try out <a
+        href="https://github.com/ascellahost/gui"
+        class="link link-hover link-secondary"
+        target="_blank">The desktop app</a
+      >
+    </p>
   </form>
 </div>

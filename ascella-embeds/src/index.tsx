@@ -28,8 +28,9 @@ export default {
     if (path == "robots.txt") return new Response("User-agent: *\nDisallow: /", { headers: { "content-type": "text/plain" } });
     const name = path.split("/").at(-1) || "";
 
-    if (headers.some((x) => req.headers.get("user-agent")?.toLowerCase().includes(x)) || req.url.endsWith("+")) {
-      const r = await fetch(`https://api.ascella.host/api/v3/files/${name}`);
+    if (headers.some((x) => req.headers.get("user-agent")?.toLowerCase().includes(x))) {
+      // Little hack
+      const r = await fetch(`https://ascella.tricked.workers.dev/api/v3/files/${name}`);
       if (r.ok) {
         const rson = (await r.json()) as any;
         if (rson.redirect) {
@@ -72,6 +73,7 @@ export default {
         });
       }
     }
+
     return Response.redirect(`https://ascella.host/v/${name}`, 301);
   },
 };

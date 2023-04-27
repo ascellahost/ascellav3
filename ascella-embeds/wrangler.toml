@@ -1,6 +1,6 @@
 name = "ascella-embeds"
 main = "src/index.tsx"
-compatibility_date = "2022-09-21"
+compatibility_date = "2023-04-27"
 routes = [
     "*.ascella.host/*",
     "i.tricked.pro/*",

@@ -213,6 +213,20 @@ api.post("/upload", async (c) => {
 
   const raw = `${APP_URL}/cdn/${user.uuid}/${filename}`;
 
+  let data = {
+    name: filename,
+    size: file.size,
+    type: file.type,
+    vanity: vanity,
+    upload_name: file.name,
+  };
+  if (user.uuid) {
+    //@ts-ignore -
+    data.uploader = user.uuid;
+  }
+
+  await fOrm.InsertOne(data);
+
   let res = await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
     httpMetadata: {
       contentType: file.type,
@@ -223,14 +237,6 @@ api.post("/upload", async (c) => {
       ip: c.req.headers.get("cf-connecting-ip") || "",
       ...embed,
     },
-  });
-  await fOrm.InsertOne({
-    name: filename,
-    size: file.size,
-    type: file.type,
-    vanity: vanity,
-    upload_name: file.name,
-    uploader: user.id,
   });
 
   return Response.json({
@@ -282,7 +288,7 @@ api.get("/me/files", async (c) => {
     offset: perPage * page,
     orderBy: "id",
   });
-  const loc = `${APP_URL}/cdn/${data.id}/`;
+  const loc = `${APP_URL}/cdn/${data.uuid}/`;
 
   let result = images.results?.map((x) => ({
     name: x.upload_name,

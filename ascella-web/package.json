@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^6.2.2",
+    "@astrojs/mdx": "^0.19.0",
     "@astrojs/svelte": "^2.1.0",
     "@astrojs/tailwind": "^3.1.1",
     "astro": "^2.3.0",
@@ -18,5 +19,8 @@
     "svelte": "^3.54.0",
     "svelte-material-icons": "2.0.4",
     "tailwindcss": "^3.0.24"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9"
   }
 }
