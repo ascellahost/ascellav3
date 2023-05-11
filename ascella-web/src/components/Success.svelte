@@ -1,7 +1,8 @@
 <script lang="ts">
-  export let url: URL;
-  let { vanity, d: del, url: urls } = Object.fromEntries(url.searchParams.entries());
+  export let url = new URL(window.location.href);
+  let { d: del, c: urls } = Object.fromEntries(url.searchParams.entries());
   let borders = false;
+  let vanity = urls.split("/").at(-1)?.split(".")[0];
 
   let input: HTMLInputElement;
 </script>
@@ -12,11 +13,7 @@
   {:then result}
     {#if result.raw}
       <a href={`/v/${vanity}`}>
-        <div
-          class={borders
-            ? "bg-gradient-to-bl from-primary to-secondary rounded-md p-2 duration-1000 hover:bg-gradient-to-l hover:from-secondary hover:to-primary"
-            : ""}
-        >
+        <div class={borders ? "background-animate bg-gradient-to-l from-primary to-secondary rounded-md p-2" : ""}>
           <img
             on:load={() => (borders = true)}
             src={result.raw}
@@ -55,3 +52,26 @@
     >
   </div>
 {/if}
+
+<style>
+  .background-animate {
+    background-size: 200%;
+    -webkit-animation: AnimateBackgroud 2s ease infinite;
+    -moz-animation: AnimateBackgroud 2s ease infinite;
+    animation: AnimateBackgroud 2s ease infinite;
+  }
+
+  @keyframes AnimateBackgroud {
+    20% {
+      background-position: 0;
+    }
+
+    50% {
+      background-position: 100%;
+    }
+
+    80% {
+      background-position: 0;
+    }
+  }
+</style>
