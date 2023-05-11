@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/layout.astro";
+import Success from "../components/Success.svelte";
+export const prerender = true;
+---
+
+<Layout>
+  <h1 class="text-center text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-accent to-primary p-2">
+    Upload success
+  </h1>
+  <Success client:only url={Astro.url} />
+</Layout>

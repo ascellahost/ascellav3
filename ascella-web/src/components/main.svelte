@@ -59,9 +59,6 @@
   } as any;
 </script>
 
-<div>
-  <p class="text-3xl font-bold text-center">Ascella.host</p>
-</div>
 <div class="max-w-6xl mx-auto">
   <div class="flex flex-wrap gap-2 mx-auto px-auto justify-center mb-10">
     {#each features as feature}
