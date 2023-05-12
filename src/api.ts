@@ -7,6 +7,7 @@ import { Styles, UploadLimits } from "common/build/main";
 import { getHeaderDefaults, stringInject } from "./utils";
 import { getOrm } from "./orm";
 import { validator } from "hono/validator";
+import { InferFromColumns, DataTypes } from "d1-orm";
 
 export const api = new Hono<{ Bindings: Bindings }>();
 api.use(
@@ -43,6 +44,8 @@ api.get("/files/:vanity/delete/:delete", async (c) => {
   return Response.json(basicData(202, "File deleted", true));
 });
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 api.get("/files/:vanity", async (c) => {
   const { vanity } = c.req.param();
   const { files } = getOrm(c.env.ASCELLA_DB);
@@ -54,8 +57,14 @@ api.get("/files/:vanity", async (c) => {
 
   if (!file) return notFound();
   const loc = `${file.uploader || "guest"}/${file.name}`;
-  const meta = await c.env.ASCELLA_DATA.head(loc);
-
+  let meta = await c.env.ASCELLA_DATA.head(loc);
+  if (!meta) {
+    for (let i = 0; i < 5; i++) {
+      await sleep(300);
+      meta = await c.env.ASCELLA_DATA.head(loc);
+      if (meta) break;
+    }
+  }
   if (!meta) return notFound();
   if (
     (!meta.customMetadata?.["expires-at"] || new Date(meta.customMetadata["expires-at"]).getTime() < Date.now()) &&
@@ -129,8 +138,18 @@ api.post("/upload", async (c) => {
     return badRequest("Ascella is currently shutdown");
   }
 
-  let user;
+  let user: InferFromColumns<{
+    id: { type: DataTypes.INTEGER; primaryKey: boolean; autoIncrement: boolean; notNull: true };
+    name: { type: DataTypes.TEXT; notNull: true; unique: boolean };
+    email: { type: DataTypes.TEXT; unique: boolean; notNull: true };
+    token: { type: DataTypes.TEXT; notNull: true };
+    uuid: { type: DataTypes.TEXT; unique: boolean; notNull: true };
+    domain: { type: DataTypes.TEXT; notNull: true };
+  }> & {
+    upload_limit: UploadLimits;
+  };
   if (c.req.headers.get("ascella-token")) {
+    //@ts-ignore -
     user = await users.First({
       where: {
         token: c.req.headers.get("ascella-token")!,
@@ -145,8 +164,9 @@ api.post("/upload", async (c) => {
       name: "",
       domain: "ascella.host",
       uuid: "guest",
-      limit: UploadLimits.Guest,
-      url_style: Styles.default,
+      upload_limit: UploadLimits.Guest,
+      id: 0,
+      token: "",
     };
   }
 
@@ -188,12 +208,17 @@ api.post("/upload", async (c) => {
     settings.ext ? `.${settings.ext}` : "",
   ].join("");
 
-  const replaces = {
+  function convertBytesToMB(bytes: number) {
+    return bytes / (1024 * 1024);
+  }
+
+  const replaces: Record<string, string> = {
     ip: c.req.headers.get("cf-connecting-ip"),
     filename: file.name,
     vanity: vanity,
     size: file.size,
     type: file.type,
+    size_fmt: convertBytesToMB(file.size),
     extension: ext,
     now: new Date(Date.now()).toISOString(),
     ...settings,
@@ -201,51 +226,67 @@ api.post("/upload", async (c) => {
     ...Object.fromEntries(c.req.headers.entries()),
   };
 
+  let extraReplaces = c.req.headers.get("ascella-extra-replaces") == "true";
+  if (extraReplaces && user.uuid) {
+    let result: { images: number; size: number } = await c.env.ASCELLA_DB.prepare(
+      "select count(*) as images, SUM(size) as size from files where uploader = ? limit 1"
+    )
+      .bind([user.uuid])
+      .first();
+    replaces.images = result.images.toString();
+    replaces.size = result.size.toString();
+    replaces.size_fmt = convertBytesToMB(result.size).toString();
+  }
+
   const embed = {
-    color: settings.embed.color ?? "",
+    color: stringInject(settings.embed.color, replaces) ?? "",
     title: stringInject(settings.embed.title, replaces),
     description: stringInject(settings.embed.description, replaces),
     sitename: stringInject(settings.embed.sitename, replaces),
     sitenameUrl: (settings.embed.sitenameUrl as string) ?? "",
     author: stringInject(settings.embed.author, replaces),
-    authorUrl: (settings.embed.authorUrl as string) ?? "",
+    authorUrl: stringInject(settings.embed.authorUrl as string, replaces) ?? "",
   };
 
   const raw = `${APP_URL}/cdn/${user.uuid}/${filename}`;
 
-  let data = {
-    name: filename,
-    size: file.size,
-    type: file.type,
-    vanity: vanity,
-    upload_name: file.name,
+  let postResponse = async () => {
+    let data = {
+      name: filename,
+      size: file.size,
+      type: file.type,
+      vanity: vanity,
+      upload_name: file.name,
+    };
+    if (user.uuid) {
+      //@ts-ignore -
+      data.uploader = user.uuid;
+    }
+
+    await fOrm.InsertOne(data);
+
+    await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
+      httpMetadata: {
+        contentType: file.type,
+      },
+      customMetadata: {
+        "expires-at": settings.autodelete ? (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000).toString() : "",
+        delete: del,
+        ip: c.req.headers.get("cf-connecting-ip") || "",
+        ...embed,
+      },
+    });
   };
-  if (user.uuid) {
-    //@ts-ignore -
-    data.uploader = user.uuid;
-  }
 
-  await fOrm.InsertOne(data);
-
-  let res = await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
-    httpMetadata: {
-      contentType: file.type,
-    },
-    customMetadata: {
-      "expires-at": settings.autodelete ? (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000).toString() : "",
-      delete: del,
-      ip: c.req.headers.get("cf-connecting-ip") || "",
-      ...embed,
-    },
-  });
+  c.executionCtx.waitUntil(postResponse());
 
   return Response.json({
     filename: filename,
     raw: raw,
-    upload_date: res.uploaded.toISOString(),
+    upload_date: replaces.now,
     delete: `${APP_URL}/api/v3/files/${vanity}/delete/${del}`,
     metadata: `${APP_URL}/api/v3/files/${vanity}`,
-    size: res.size,
+    size: replaces.size,
     vanity: vanity,
     url,
   });
