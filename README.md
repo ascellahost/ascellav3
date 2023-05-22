@@ -1,6 +1,6 @@
 # Ascella (to the clouds)
 
-This is Ascella but fully rewritten to work with the Cloudflare ecosystem
+This is Ascella but fully rewritten to work with the [Cloudflare ecosystem](https://cloudflare.com/), using workers, D1, R2 & KV.
 
 Here is a simple flow chart:
 

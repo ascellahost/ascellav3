@@ -17,7 +17,8 @@
     {
       name: "Fast",
       icon: Fast,
-      description: "Ascella is fully ran on Cloudflare Workers and optimized for speed.",
+      description:
+        "Ascella is fully ran on <a href='https://cloudflare.com/'  class='link link-primary'  target='_blank'>Cloudflare</a> Workers and optimized for speed.",
     },
     {
       name: "Secure",
@@ -27,12 +28,13 @@
     {
       name: "Uptime",
       icon: Uptime,
-      description: "Asccella is almost never down cause its hosted on the Cloudflare network",
+      description:
+        "Ascella is almost never down cause its hosted on the <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers. <br>Ascella is fully up and running on <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a> network",
     },
     {
       name: "Support",
       icon: Support,
-      description: "We have give great support to our users",
+      description: "We have give great support to our users in the Discord server",
     },
     {
       name: "Compatibility",
@@ -72,7 +74,7 @@
 
         <div class="description">
           <p>
-            {feature.description}
+            {@html feature.description}
           </p>
         </div>
       </div>
