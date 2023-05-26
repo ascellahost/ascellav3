@@ -115,7 +115,7 @@ export function getOrm(db: D1Database) {
         notNull: true,
       },
       uploader: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         notNull: false,
       },
     }

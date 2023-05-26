@@ -133,7 +133,7 @@ api.get("/reviews.json", async (c) => {
 });
 
 api.post("/upload", async (c) => {
-  let { users } = getOrm(c.env.ASCELLA_DB);
+  let { users, files: filesDb } = getOrm(c.env.ASCELLA_DB);
   if ((await c.env.ASCELLA_KV.get("shutdown")) == "true") {
     return badRequest("Ascella is currently shutdown");
   }
@@ -185,7 +185,7 @@ api.post("/upload", async (c) => {
   if (file.size > user.upload_limit!) {
     return badRequest("Payload too large!");
   }
-  const { files: fOrm } = getOrm(c.env.ASCELLA_DB);
+
   const bannedFileTypes = ["application/"];
 
   if (bannedFileTypes.some((x) => (file as File)?.type.startsWith(x))) {
@@ -263,7 +263,7 @@ api.post("/upload", async (c) => {
       data.uploader = user.uuid;
     }
 
-    await fOrm.InsertOne(data);
+    await filesDb.InsertOne(data);
 
     await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
       httpMetadata: {
@@ -323,7 +323,7 @@ api.get("/me/files", async (c) => {
 
   const images = await files.All({
     where: {
-      uploader: data.id,
+      uploader: data.uuid,
     },
     limit: perPage,
     offset: perPage * page,
