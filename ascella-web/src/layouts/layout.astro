@@ -48,7 +48,7 @@ const footerItems = [
     <footer class="mt-2 max-w-[70rem] mx-auto">
       <ul class="flex flex-wrap mb-10 justify-center">
         {
-          footerItems.map((element: { url: string; name: string }) => (
+          footerItems.map((element: { url: string; name: string; last: boolean }) => (
             <li class="mx-3">
               <a class="link link-hover link-primary" href={element.url}>
                 {element.name}
