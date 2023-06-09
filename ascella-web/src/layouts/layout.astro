@@ -26,9 +26,13 @@ const footerItems = [
     last: true,
   },
 ];
+
+import ToggleSwitch from "svelte-material-icons/ToggleSwitch.svelte";
+import WeatherSunny from "svelte-material-icons/WeatherSunny.svelte"
+import WeatherNight from "svelte-material-icons/WeatherNight.svelte"
 ---
 
-<html lang="en">
+<html lang="en" class="bg-base-100">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -39,14 +43,19 @@ const footerItems = [
   <body>
     <head>
       <div>
-        <p class="text-5xl font-bold text-center m-10">
-          <a class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white" href="/">Ascella.host</a>
+        <div class="text-3xl flex absolute top-4 right-4">
+          <span class="my-auto"><WeatherSunny /></span>
+          <span id="lightdark" class="text-5xl cursor-pointer"><ToggleSwitch /></span>
+          <span class="my-auto"><WeatherNight /></span>
+        </div>
+        <p class="text-5xl font-bold text-center p-10">
+          <a class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-content select-none" href="/">Ascella.host</a>
         </p>
       </div>
     </head>
     <slot />
     <footer class="mt-2 max-w-[70rem] mx-auto">
-      <ul class="flex flex-wrap mb-10 justify-center">
+      <ul class="flex flex-wrap pb-10 justify-center">
         {
           footerItems.map((element: { url: string; name: string; last: boolean }) => (
             <li class="mx-3">
@@ -54,10 +63,29 @@ const footerItems = [
                 {element.name}
               </a>
             </li>
-            <span>{element.last === true ? '' : '/'}</span>
+            <span>{element.last ? '' : '/'}</span>
           ))
         }
       </ul>
     </footer>
+    <script lang="ts">
+      let darkMode = true;
+      const svgToggleSwitch = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M17,15A3,3 0 0,1 14,12A3,3 0 0,1 17,9A3,3 0 0,1 20,12A3,3 0 0,1 17,15Z" fill="currentColor"></path></svg>`;
+      const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M7,15A3,3 0 0,1 4,12A3,3 0 0,1 7,9A3,3 0 0,1 10,12A3,3 0 0,1 7,15Z" fill="currentColor"></path></svg>`;
+
+      function toggleDarkLight() {
+        if (darkMode) {
+          document.body.setAttribute('data-theme', 'yolo-light');
+          document.getElementById('lightdark').innerHTML = svgToggleSwitchOff;
+          darkMode = false;
+        } else {
+          document.body.setAttribute('data-theme', 'yolo-dark');
+          document.getElementById('lightdark').innerHTML = svgToggleSwitch;
+          darkMode = true;
+        }
+      }
+
+      document.getElementById('lightdark').addEventListener('click', toggleDarkLight);
+    </script>
   </body>
 </html>

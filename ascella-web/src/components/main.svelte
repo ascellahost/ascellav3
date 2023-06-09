@@ -90,7 +90,7 @@
     <span class="w-max"></span>
   </div>
 
-  <hr class="py-5" />
+  <hr class="py-5 border-primary-content" />
   <div>
     <h2 class="text-3xl font-bold m-2">Stats</h2>
     <div class="flex gap-2">
@@ -122,5 +122,5 @@
       {/each}
     </div>
   </div>
-  <hr class="py-5 mt-10" />
+  <hr class="py-5 mt-10 border-primary-content" />
 </div>
