@@ -12,34 +12,34 @@
     {
       name: "Open Source",
       icon: OpenSource,
-      description: "Ascella is open source and free to use. You can contribute to the project on GitHub.",
+      description: "Ascella is open source and free to use. You can view and contribute to the project on the <a href='https://github.com/ascellahost/ascellav3' class='link link-primary' target='_blank'>GitHub</a>.",
     },
     {
       name: "Fast",
       icon: Fast,
       description:
-        "Ascella is fully ran on <a href='https://cloudflare.com/'  class='link link-primary'  target='_blank'>Cloudflare</a> Workers and optimized for speed.",
+        "Ascella is fully hosted on <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers, and is optimized for speedy uploads.",
     },
     {
       name: "Secure",
       icon: Secure,
-      description: "Ascella images are not indexed by search engines",
+      description: "Ascella images are not indexed by search engines.",
     },
     {
       name: "Uptime",
       icon: Uptime,
       description:
-        "Ascella is almost never down cause its hosted on the <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers. <br>Ascella is fully up and running on <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a> network",
+        "Ascella will nearly never go down because it is hosted on <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers.",
     },
     {
       name: "Support",
       icon: Support,
-      description: "We have give great support to our users in the Discord server",
+      description: "We have a great support team on our <a href='https://discord.gg/BDxd9AuHpr' class='link link-primary' target='_blank'>discord server</a> in case you ever run into any problems.",
     },
     {
       name: "Compatibility",
       icon: Compatibility,
-      description: "Ascella is compatible with all major operating systems",
+      description: "Ascella is compatible with all major operating systems.",
     },
   ];
 
@@ -52,9 +52,9 @@
   import Storage from "svelte-material-icons/Harddisk.svelte";
   import Link from "svelte-material-icons/Link.svelte";
   const statIconsAndRenames = {
-    files: ["File's Uploaded", File],
+    files: ["Files Uploaded", File],
     domains: ["Custom Domains", Domain],
-    views: ["File views", Eye],
+    views: ["Views", Eye],
     users: ["Users", User],
     storageUsage: ["Storage Used", Storage, true],
     redirects: ["Redirects created", Link],
