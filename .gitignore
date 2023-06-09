@@ -9,3 +9,4 @@ dist
 # Moon
 .moon/cache
 env.json
+*.lock

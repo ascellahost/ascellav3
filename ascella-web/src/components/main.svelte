@@ -12,34 +12,34 @@
     {
       name: "Open Source",
       icon: OpenSource,
-      description: "Ascella is open source and free to use. You can contribute to the project on GitHub.",
+      description: "Ascella is open source and free to use. You can view and contribute to the project on the <a href='https://github.com/ascellahost/ascellav3' class='link link-primary' target='_blank'>GitHub</a>.",
     },
     {
       name: "Fast",
       icon: Fast,
       description:
-        "Ascella is fully ran on <a href='https://cloudflare.com/'  class='link link-primary'  target='_blank'>Cloudflare</a> Workers and optimized for speed.",
+        "Ascella is fully hosted on <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers, and is optimized for speedy uploads.",
     },
     {
       name: "Secure",
       icon: Secure,
-      description: "Ascella images are not indexed by search engines",
+      description: "Ascella images are not indexed by search engines.",
     },
     {
       name: "Uptime",
       icon: Uptime,
       description:
-        "Ascella is almost never down cause its hosted on the <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers. <br>Ascella is fully up and running on <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a> network",
+        "Ascella will nearly never go down because it is hosted on <a href='https://cloudflare.com/' class='link link-primary' target='_blank'>Cloudflare</a> Workers.",
     },
     {
       name: "Support",
       icon: Support,
-      description: "We have give great support to our users in the Discord server",
+      description: "We have a great support team on our <a href='https://discord.gg/BDxd9AuHpr' class='link link-primary' target='_blank'>discord server</a> in case you ever run into any problems.",
     },
     {
       name: "Compatibility",
       icon: Compatibility,
-      description: "Ascella is compatible with all major operating systems",
+      description: "Ascella is compatible with all major operating systems.",
     },
   ];
 
@@ -52,9 +52,9 @@
   import Storage from "svelte-material-icons/Harddisk.svelte";
   import Link from "svelte-material-icons/Link.svelte";
   const statIconsAndRenames = {
-    files: ["File's Uploaded", File],
+    files: ["Files Uploaded", File],
     domains: ["Custom Domains", Domain],
-    views: ["File views", Eye],
+    views: ["Views", Eye],
     users: ["Users", User],
     storageUsage: ["Storage Used", Storage, true],
     redirects: ["Redirects created", Link],
@@ -64,10 +64,10 @@
 <div class="max-w-6xl mx-auto">
   <div class="flex flex-wrap gap-2 mx-auto px-auto justify-center mb-10">
     {#each features as feature}
-      <div class="feature w-80 bg-base-200 p-4 rounded-sm">
+      <div class="feature w-80 bg-base-200 p-4 rounded">
         <div class="">
           <h2 class="flex leading-none text-3xl mb-2 font-bold">
-            <svelte:component this={feature.icon} height="1em" />
+            <span class="mr-1"><svelte:component this={feature.icon} height="1em" /></span>
             {feature.name}
           </h2>
         </div>
@@ -80,21 +80,22 @@
       </div>
     {/each}
   </div>
-  <div>
-    <a href="/config_wizard" class="link link-primary text-3xl py-3 no-underline flex">
-      <span class="animate-ping">
+  <div class="flex">
+    <a href="/config_wizard" class="link link-primary text-3xl my-3 no-underline flex">
+      <span class="my-auto">
         <ArrowRight />
       </span>
-      Create config</a
-    >
+      Create config
+    </a>
+    <span class="w-max"></span>
   </div>
 
   <hr class="py-5" />
   <div>
-    <h2 class="text-3xl font-bold">Stats</h2>
-    <div class="flex">
+    <h2 class="text-3xl font-bold m-2">Stats</h2>
+    <div class="flex gap-2">
       {#each Object.entries(stats).filter((x) => statIconsAndRenames[x[0]]) as [key, value]}
-        <div class="stat w-80 bg-base-200 p-4 border-2">
+        <div class="stat w-80 bg-base-200 p-4 rounded">
           <div class="flex">
             <h2 class="flex leading-none mb-2 gap-1">
               <svelte:component this={statIconsAndRenames[key][1]} height="1em" />
@@ -121,4 +122,5 @@
       {/each}
     </div>
   </div>
+  <hr class="py-5 mt-10" />
 </div>
