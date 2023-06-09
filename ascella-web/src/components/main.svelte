@@ -80,13 +80,14 @@
       </div>
     {/each}
   </div>
-  <div>
-    <a href="/config_wizard" class="link link-primary text-3xl py-3 no-underline flex">
+  <div class="flex">
+    <a href="/config_wizard" class="link link-primary text-3xl my-3 no-underline flex">
       <span class="my-auto">
         <ArrowRight />
       </span>
-      Create config</a
-    >
+      Create config
+    </a>
+    <span class="w-max"></span>
   </div>
 
   <hr class="py-5" />
