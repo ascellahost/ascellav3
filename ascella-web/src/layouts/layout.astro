@@ -38,6 +38,11 @@ import WeatherNight from "svelte-material-icons/WeatherNight.svelte"
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="author" content="tricked & stef ❤️" />
+    <meta
+      name="description"
+      content="The fastest image uploader on the internet."
+    />
     <title>Ascella.host</title>
   </head>
   <body>
@@ -69,23 +74,36 @@ import WeatherNight from "svelte-material-icons/WeatherNight.svelte"
       </ul>
     </footer>
     <script lang="ts">
-      let darkMode = true;
+      const lightdark = document.getElementById('lightdark');
+      const htmlElement = document.documentElement;
+      let theme = localStorage.getItem('theme') || 'yolo-dark';
+      htmlElement.setAttribute('data-theme', theme);
+
       const svgToggleSwitch = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M17,15A3,3 0 0,1 14,12A3,3 0 0,1 17,9A3,3 0 0,1 20,12A3,3 0 0,1 17,15Z" fill="currentColor"></path></svg>`;
       const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M7,15A3,3 0 0,1 4,12A3,3 0 0,1 7,9A3,3 0 0,1 10,12A3,3 0 0,1 7,15Z" fill="currentColor"></path></svg>`;
 
-      function toggleDarkLight() {
-        if (darkMode) {
-          document.body.setAttribute('data-theme', 'yolo-light');
-          document.getElementById('lightdark').innerHTML = svgToggleSwitchOff;
-          darkMode = false;
-        } else {
-          document.body.setAttribute('data-theme', 'yolo-dark');
-          document.getElementById('lightdark').innerHTML = svgToggleSwitch;
-          darkMode = true;
-        }
+      if (theme === 'yolo-dark') {
+        htmlElement.setAttribute('data-theme', 'yolo-dark');
+        lightdark.innerHTML = svgToggleSwitch;
+      } else {
+        htmlElement.setAttribute('data-theme', 'yolo-light');
+        lightdark.innerHTML = svgToggleSwitchOff;
       }
 
-      document.getElementById('lightdark').addEventListener('click', toggleDarkLight);
+      function toggleDarkLight() {
+        if (theme === 'yolo-dark') {
+          htmlElement.setAttribute('data-theme', 'yolo-light');
+          lightdark.innerHTML = svgToggleSwitchOff;
+          theme = 'yolo-light';
+        } else {
+          htmlElement.setAttribute('data-theme', 'yolo-dark');
+          lightdark.innerHTML = svgToggleSwitch;
+          theme = 'yolo-dark';
+        }
+        localStorage.setItem("theme", theme);
+      }
+
+      lightdark.addEventListener('click', toggleDarkLight);
     </script>
   </body>
 </html>
