@@ -64,10 +64,10 @@
 <div class="max-w-6xl mx-auto">
   <div class="flex flex-wrap gap-2 mx-auto px-auto justify-center mb-10">
     {#each features as feature}
-      <div class="feature w-80 bg-base-200 p-4 rounded-sm">
+      <div class="feature w-80 bg-base-200 p-4 rounded">
         <div class="">
           <h2 class="flex leading-none text-3xl mb-2 font-bold">
-            <svelte:component this={feature.icon} height="1em" />
+            <span class="mr-1"><svelte:component this={feature.icon} height="1em" /></span>
             {feature.name}
           </h2>
         </div>
@@ -82,7 +82,7 @@
   </div>
   <div>
     <a href="/config_wizard" class="link link-primary text-3xl py-3 no-underline flex">
-      <span class="animate-ping">
+      <span class="my-auto">
         <ArrowRight />
       </span>
       Create config</a
@@ -91,10 +91,10 @@
 
   <hr class="py-5" />
   <div>
-    <h2 class="text-3xl font-bold">Stats</h2>
-    <div class="flex">
+    <h2 class="text-3xl font-bold m-2">Stats</h2>
+    <div class="flex gap-2">
       {#each Object.entries(stats).filter((x) => statIconsAndRenames[x[0]]) as [key, value]}
-        <div class="stat w-80 bg-base-200 p-4 border-2">
+        <div class="stat w-80 bg-base-200 p-4 rounded">
           <div class="flex">
             <h2 class="flex leading-none mb-2 gap-1">
               <svelte:component this={statIconsAndRenames[key][1]} height="1em" />
@@ -121,4 +121,5 @@
       {/each}
     </div>
   </div>
+  <hr class="py-5 mt-10" />
 </div>
