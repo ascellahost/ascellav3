@@ -11,5 +11,7 @@ declare var CLOUDFLARE_SECRET: string;
 declare var APP_URL: string;
 declare var SENTRY_DSN: string;
 declare var DEBUG: boolean;
+declare var GUILD_STATS_ID: string;
+declare var GUILD_ID: string
 
 declare var ulid: (timestamp?: number) => string;

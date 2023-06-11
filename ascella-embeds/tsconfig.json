@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig",
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
@@ -7,5 +8,6 @@
     "jsxFragmentFactory": "Fragment",
     "lib": ["ES2020", "ES2022"],
     "types": ["@cloudflare/workers-types"]
-  }
+  },
+  "include": ["src/**/*", "../bindings.d.ts"],
 }

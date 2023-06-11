@@ -1,5 +1,5 @@
 {
-  "name": "ascella",
+  "name": "ascella-bot",
   "version": "1.0.0",
   "description": "Ascella.host",
   "type": "module",
@@ -25,6 +25,8 @@
     "@types/mime-types": "^2.1.1",
     "common": "workspace:./common",
     "d1-orm": "^0.7.2",
+    "discord-interactions": "^3.3.0",
+    "discordeno": "^18.0.1",
     "esbuild": "^0.17.17",
     "hono": "^3.1.6",
     "mime-types": "^2.1.35",
@@ -40,6 +42,5 @@
   "engines": {
   },
   "dependencies": {
-    "@hono/sentry": "^0.2.0"
   }
 }

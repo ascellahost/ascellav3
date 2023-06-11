@@ -1,0 +1,26 @@
+name = "ascella-bot"
+main = "dist/index.mjs"
+compatibility_date = "2023-04-22"
+compatibility_flags = []
+route = "bot.ascella.host/*"
+
+[[kv_namespaces]]
+binding = "ASCELLA_KV"
+id = "791ec09b5178468daebf5e3a67239cce"
+preview_id = "6c193a1af81543ebab5935d61adf0fa0"
+
+[[r2_buckets]]
+binding = "ASCELLA_DATA"
+bucket_name = "ascella"
+preview_bucket_name = "cdn"
+
+[[d1_databases]]
+binding = "ASCELLA_DB"
+database_name = "ascella"
+database_id = "b93587c3-9cd6-48a1-b06d-ac31cc9c7ec0"
+
+[build]
+command = "node build.js"
+
+[triggers]
+crons = ["0 * * * *"]

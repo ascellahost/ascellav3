@@ -4,16 +4,11 @@ export interface Env {
 
 const headers = [
   "discord",
-  "github",
-  "twitter",
-  "youtube",
   "instagram",
   "linkedin",
   "github",
   "twitter",
   "youtube",
-  "instagram",
-  "linkedin",
   "element",
   "revolt",
   "curl",
@@ -21,20 +16,20 @@ const headers = [
   "cinny",
   "reddit",
 ];
-
+const response = Response;
+const redirect = response.redirect;
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request): Promise<Response> {
     let path = new URL(req.url).pathname;
-    if (path == "robots.txt") return new Response("User-agent: *\nDisallow: /", { headers: { "content-type": "text/plain" } });
+    if (path == "robots.txt") return new response("User-agent: *\nDisallow: /", { headers: { "content-type": "text/plain" } });
     const name = path.split("/").at(-1) || "";
 
     if (headers.some((x) => req.headers.get("user-agent")?.toLowerCase().includes(x))) {
-      // Little hack
       const r = await fetch(`https://ascella.tricked.workers.dev/api/v3/files/${name}`);
       if (r.ok) {
         const rson = (await r.json()) as any;
         if (rson.redirect) {
-          return Response.redirect(rson.redirect);
+          return redirect(rson.redirect);
         }
         const { embed } = rson;
         const meta = [
@@ -66,7 +61,7 @@ export default {
           `</body>` +
           `</html>`;
 
-        return new Response(data, {
+        return new response(data, {
           headers: {
             "content-type": "text/html; charset=UTF-8",
           },
@@ -74,6 +69,6 @@ export default {
       }
     }
 
-    return Response.redirect(`https://ascella.host/v/${name}`, 301);
+    return redirect(`https://ascella.host/v/${name}`, 301);
   },
 };
