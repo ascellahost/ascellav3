@@ -23,4 +23,4 @@ database_id = "b93587c3-9cd6-48a1-b06d-ac31cc9c7ec0"
 command = "node build.js"
 
 [triggers]
-crons = ["0 * * * *"]
+crons = ["0 * * * *", "30 0 * * *"]

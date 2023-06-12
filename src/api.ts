@@ -90,6 +90,8 @@ api.get("/files/:vanity", async (c) => {
   });
 });
 
+
+
 api.get("/stats.json", async (c) => {
   const qr = c.env.ASCELLA_DB.prepare(
     `SELECT ( SELECT COUNT(*) FROM files ) AS files, ( SELECT COUNT(*) FROM users ) AS users, ( SELECT COUNT(*) FROM users ) AS users, COUNT(*) as domains, ( SELECT COUNT(*) FROM reviews ) AS reviews, ( SELECT SUM(size) FROM files ) AS storageUsage, ( SELECT COUNT(*) FROM files WHERE type = 'redirect' ) AS redirects FROM domains LIMIT 1`

@@ -25,8 +25,20 @@ app.get("/cdn/:id/:file", async (c) => {
   });
 });
 
+app.get("/stats.jsonl", async (c) => {
+  if (c.req.headers.get("Authorization") !== ADMIN_SECRET && c.req.query().authorization !== ADMIN_SECRET) return notFound();
+  const res = await c.env.ASCELLA_DATA.get("stats.jsonl");
+  return c.text(await res?.text() || "", {
+    status: 200,
+    headers: {
+      "Content-Type": "application/jsonl",
+      "cache-control": "public, max-age=31536000",
+    }
+  });
+})
+
 app
-  .get(async (c) => {
+  .get("/discord", async (c) => {
     const { token, force } = c.req.query();
     if (!token) {
       return Response.json({ error: "Missing Token" }, { status: 400 });

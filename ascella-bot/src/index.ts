@@ -70,6 +70,7 @@ app
     });
 
 const scheduled = async (controller: any, env: Bindings, ctx: any) => {
+
     const qr = env.ASCELLA_DB.prepare(
         `SELECT ( SELECT COUNT(*) FROM files ) AS files, ( SELECT COUNT(*) FROM users ) AS users, ( SELECT COUNT(*) FROM users ) AS users, COUNT(*) as domains, ( SELECT COUNT(*) FROM reviews ) AS reviews, ( SELECT SUM(size) FROM files ) AS storageUsage, ( SELECT COUNT(*) FROM files WHERE type = 'redirect' ) AS redirects FROM domains LIMIT 1`
     );
@@ -97,6 +98,7 @@ const scheduled = async (controller: any, env: Bindings, ctx: any) => {
     ]
 
     for (let i = 0; i < list.length; i++) {
+        if (orderedChannels[i].name == list[i]) continue;
         await actx.rest(`/channels/${orderedChannels[i].id}`, {
             method: "PATCH",
             body: {
@@ -104,6 +106,73 @@ const scheduled = async (controller: any, env: Bindings, ctx: any) => {
             }
         })
     }
+    if (controller.cron !== "30 0 * * *") {
+        // normal hourly cron
+        return
+    }
+
+    const date = new Date();
+
+    date.setDate(date.getDate() - 1);
+
+    const body = {
+        query: `
+{
+  viewer {
+    zones(filter: { zoneTag: $tag }) {
+      httpRequests1dGroups( limit: 1, filter: {  date: $date }) {
+				 uniq {
+				 uniques
+			}
+				sum {
+					threats,
+					bytes,
+					requests,
+					encryptedRequests,
+					cachedBytes,
+					pageViews,
+				}
+			}
+    }
+  }
+}
+    `,
+        variables: {
+            tag: "01b3972a62eb7e60ae8657bae191fc18",
+            date: date.toISOString().split("T")[0],
+        },
+    };
+
+
+
+    const res = await fetch(`https://api.cloudflare.com/client/v4/graphql`, {
+        method: "POST",
+        headers: {
+            authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
+        },
+        body: JSON.stringify(body),
+    });
+
+    const data = await res.json() as any;
+
+    const vv = data.data.viewer.zones[0].httpRequests1dGroups[0]
+
+    const obj = {
+        date: date.toISOString().split("T")[0],
+        date_full: date.toISOString(),
+        date_ms: +date,
+        ...vv.sum,
+        ...vv.uniq,
+        ...record,
+    }
+
+    const json = JSON.stringify(obj) + "\n";
+
+    const object = await env.ASCELLA_DATA.get("stats.jsonl")
+
+    const text = await object?.text() ?? ""
+
+    await env.ASCELLA_DATA.put("stats.jsonl", text + json)
 }
 
 Object.assign(app, {
