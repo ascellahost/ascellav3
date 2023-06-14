@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/layout.astro";
+---
+
+<Layout>
+    <div class="text-center min-h-16">
+        <h1 class="text-xl">
+            Your token has been saved you can go to the <a href="/config_wizard" class="link link-primary link-hover">Config Wizard</a> to download
+            a kewl config!
+        </h1>
+        <pre id="token"></pre>
+    </div>
+
+    <script>
+        import { getConfig } from "../utils";
+        const token = new URLSearchParams(window.location.search).get("token");
+        document.getElementById("token").innerHTML = token;
+        localStorage.setItem(
+            "config",
+            JSON.stringify({
+                ...getConfig(),
+                token,
+            })
+        );
+    </script>
+</Layout>
