@@ -3,27 +3,22 @@ const footerItems = [
   {
     name: "Discord",
     url: "https://discord.gg/BDxd9AuHpr",
-    last: false,
   },
   {
     name: "Github",
     url: "https://github.com/ascellahost/ascellav3",
-    last: false,
   },
   {
     name: "Privacy",
     url: "/privacy",
-    last: false,
   },
   {
     name: "Rules",
     url: "/rules",
-    last: false,
   },
   {
     name: "DMCA",
     url: "/dmca",
-    last: true,
   },
 ];
 
@@ -62,14 +57,18 @@ import WeatherNight from "svelte-material-icons/WeatherNight.svelte"
     <footer class="mt-2 max-w-[70rem] mx-auto">
       <ul class="flex flex-wrap pb-10 justify-center">
         {
-          footerItems.map((element: { url: string; name: string; last: boolean }) => (
-            <li class="mx-3">
-              <a class="link link-hover link-primary" href={element.url}>
-                {element.name}
-              </a>
-            </li>
-            <span>{element.last ? '' : '/'}</span>
-          ))
+          footerItems
+            .flatMap((element: { url: string; name: string }) => [
+              <>
+                <li class="mx-3">
+                  <a class="link link-hover link-primary" href={element.url}>
+                    {element.name}
+                  </a>
+                </li>
+              </>,
+              <span>{"/"}</span>,
+            ])
+            .slice(0, -1)
         }
       </ul>
     </footer>

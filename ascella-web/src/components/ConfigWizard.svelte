@@ -3,6 +3,7 @@
   let config: Record<string, any> = JSON.parse(localStorage.getItem("config") ?? "null") || {
     days: 30,
     style: 1,
+    domain: "is-a-huge.monster",
 
     embed: {},
   };
@@ -10,6 +11,10 @@
   const a = document.createElement("a");
 
   let domains = fetch("https://api.ascella.host/api/v3/domains.json").then((r) => r.json());
+
+  let uploadToDesktop = false;
+
+  let error = "";
 </script>
 
 <div class="p-4 rounded-sm">
@@ -17,16 +22,16 @@
   <marquee>
     <p class="animate-spin animate-bounce animate-ping animate-pulse font-bold">Here you can create a config for Ascella.host</p>
   </marquee>
+  <span class="text-red-950 bg-yellow-200">{error}</span>
   <form
-    class="animate-spin animate-bounce animate-ping animate-pulse grid grid-cols-4 gap-4"
-    on:submit|preventDefault={() => {
+    class="grid grid-cols-4 gap-4"
+    on:submit|preventDefault={async (r) => {
       localStorage.setItem("config", JSON.stringify(config));
-
       const headers = {
         "ascella-autodelete": config.days.toString(),
         "ascella-style": config.style,
         "ascella-token": config.token,
-        "ascella-domain": `${config.subDomain ? `${config.subDomain}.` : ""}${config.domain}`,
+        "ascella-domain": `${config.subDomain ? `${config.subDomain}.` : ""}${config.domain_custom ?? config.domain}`,
         ...Object.fromEntries(
           Object.entries(config.embed)
             .filter((x) => x[1] !== "")
@@ -48,6 +53,23 @@
         ErrorMessage: "{json:error}",
       };
 
+      if (uploadToDesktop) {
+        try {
+          const result = await fetch("http://localhost:3234", {
+            method: "POST",
+            body: JSON.stringify(file),
+          });
+          if (!result.ok) {
+            error = `${result.status} : ${result.statusText}`;
+          }
+        } catch (e) {
+          //@ts-ignore -
+          error = e.message;
+        }
+        uploadToDesktop = false;
+        return;
+      }
+
       const json = JSON.stringify(file);
       const blob = new Blob([json], { type: "octet/stream" });
       const url = window.URL.createObjectURL(blob);
@@ -66,11 +88,18 @@
         <select bind:value={config.domain} class="animate-spin animate-bounce animate-ping animate-pulse select select-primary rounded-sm" required>
           {#await domains then domains}
             {#each domains as domain}
-              <option selected>{domain.domain}</option>
+              <option selected={config.domain === domain.domain}>{domain.domain}</option>
             {/each}
           {/await}
+          <option value="custom" selected={config.domain === "custom"}>Custom</option>
         </select>
       </div>
+      {#if config.domain === "custom"}
+        <div class="form-control w-full my-2 col-span-2">
+          <label class="animate-pulse">Custom Domain</label>
+          <input bind:value={config.domain_custom} placeholder="domain" class="input input-accent rounded-sm focus:translate-x-4" />
+        </div>
+      {/if}
     </div>
     <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-2">
       <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Ascella token</label>
@@ -99,62 +128,79 @@
         <option value="6">Filename</option>
       </select>
     </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Append</label>
-      <input bind:value={config.append} placeholder="append" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-x-4" />
-    </div>
+    <details class="col-span-4">
+      <summary> Advanced options </summary>
+      <div class="grid grid-cols-4 gap-4">
+        <div class="form-control w-full my-2 col-span-2">
+          <label class="animate-pulse">Append</label>
+          <input bind:value={config.append} placeholder="append" class="input input-accent rounded-sm focus:translate-x-4" />
+        </div>
 
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-1">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Custom Vanity Length</label>
-      <input bind:value={config.length} type="number" placeholder="length" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-4" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-1">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Custom Extension</label>
-      <input bind:value={config.ext} placeholder="ext" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-x-8" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Title</label>
-      <input bind:value={config.embed.title} placeholder="title" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-4" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Description</label>
-      <input bind:value={config.embed.description} placeholder="description" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-x-4" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Color</label>
-      <input bind:value={config.embed.color} placeholder="color" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-10" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Site Name</label>
-      <input bind:value={config.embed.sitename} placeholder="sitename" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-2" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Site Name URL</label>
-      <input
-        bind:value={config.embed["sitename-url"]}
-        placeholder="sitename-url"
-        class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-2"
-      />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Author</label>
-      <input bind:value={config.embed.author} placeholder="author" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-2" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Embed Author URL</label>
-      <input bind:value={config.embed["author-url"]} placeholder="author-url" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-y-2" />
-    </div>
-    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 flex">
-      <label class="animate-spin animate-bounce animate-ping animate-pulse cursor-pointer label">
-        <input type="checkbox" class="animate-spin animate-bounce animate-ping animate-pulse checkbox checkbox-error" />
-        <span class="animate-spin animate-bounce animate-ping animate-pulse label-text"> <a href="/rules">I accept the ascella rules</a></span>
+        <div class="form-control w-full my-2 col-span-1">
+          <label class="animate-pulse">Custom Vanity Length</label>
+          <input bind:value={config.length} type="number" placeholder="length" class="input input-accent rounded-sm focus:translate-y-4" />
+        </div>
+        <div class="form-control w-full my-2 col-span-1">
+          <label class="animate-pulse">Custom Extension</label>
+          <input bind:value={config.ext} placeholder="ext" class="input input-accent rounded-sm focus:translate-x-8" />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Title</label>
+          <input bind:value={config.embed.title} placeholder="title" class="input input-accent rounded-sm focus:translate-y-4" />
+        </div>
+        <div class="form-control w-full my-2 col-span-2">
+          <label class="animate-pulse">Embed Description</label>
+          <input
+            bind:value={config.embed.description}
+            placeholder="description"
+            class="input input-accent rounded-sm focus:translate-x-4"
+          />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Color</label>
+          <input bind:value={config.embed.color} placeholder="color" class="input input-accent rounded-sm focus:translate-y-10" />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Site Name</label>
+          <input bind:value={config.embed.sitename} placeholder="sitename" class="input input-accent rounded-sm focus:translate-y-2" />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Site Name URL</label>
+          <input
+            bind:value={config.embed["sitename-url"]}
+            placeholder="sitename-url"
+            class="input input-accent rounded-sm focus:translate-y-2"
+          />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Author</label>
+          <input bind:value={config.embed.author} placeholder="author" class="input input-accent rounded-sm focus:translate-y-2" />
+        </div>
+        <div class="form-control w-full my-2">
+          <label class="animate-pulse">Embed Author URL</label>
+          <input
+            bind:value={config.embed["author-url"]}
+            placeholder="author-url"
+            class="input input-accent rounded-sm focus:translate-y-2"
+          />
+        </div>
+      </div>
+    </details>
+
+    <div class="form-control w-full my-2 flex col-span-4">
+      <label class="cursor-pointer label w-52">
+        <input type="checkbox" class="checkbox checkbox-error" />
+        <span class="label-text"> <a href="/rules">I accept the ascella rules</a></span>
       </label>
     </div>
-    <button type="submit" class="animate-spin animate-bounce animate-ping animate-pulse btn btn-primary col-span-4">
-      <span class="animate-spin animate-bounce animate-ping animate-pulse animate-ping animate-pulse"><DL /></span>
+    <button type="submit" class="btn btn-primary col-span-3">
+      <span class="animate-ping"><DL /></span>
       <span> Download </span>
     </button>
-    <p class="animate-spin animate-bounce animate-ping animate-pulse col-span-2">
+    <button name="xy-type" value="desktop" type="submit" class="btn btn-primary col-span-1" on:click={() => (uploadToDesktop = true)}>
+      <span> Upload config to ascella desktop </span>
+    </button>
+    <p class="col-span-2">
       On linux or mac without sharex? no problem try out <a
         href="https://github.com/ascellahost/gui"
         class="animate-spin animate-bounce animate-ping animate-pulse link link-hover link-secondary"
