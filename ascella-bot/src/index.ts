@@ -134,12 +134,29 @@ const scheduled = async (controller: any, env: Bindings, ctx: any) => {
 				}
 			}
     }
+    accounts(filter: { accountTag: $account }) {
+      r2StorageAdaptiveGroups(
+        limit: 1
+        filter: { date: $date, bucketName: "ascella" }
+      ) {
+        dimensions {
+          date
+        }
+        max {
+          metadataSize
+          uploadCount
+          objectCount
+          payloadSize
+        }
+      }
+    }
   }
 }
     `,
         variables: {
             tag: "01b3972a62eb7e60ae8657bae191fc18",
             date: date.toISOString().split("T")[0],
+            account: CLOUDFLARE_ACCOUNT_ID
         },
     };
 
@@ -156,14 +173,15 @@ const scheduled = async (controller: any, env: Bindings, ctx: any) => {
     const data = await res.json() as any;
 
     const vv = data.data.viewer.zones[0].httpRequests1dGroups[0]
-
+    const r2 = data.data.viewer.accounts[0].r2StorageAdaptiveGroups[0]
     const obj = {
         date: date.toISOString().split("T")[0],
         date_full: date.toISOString(),
         date_ms: +date,
+        ...record,
         ...vv.sum,
         ...vv.uniq,
-        ...record,
+        ...r2.max,
     }
 
     const json = JSON.stringify(obj) + "\n";

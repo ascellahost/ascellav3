@@ -25,14 +25,16 @@ app.get("/cdn/:id/:file", async (c) => {
   });
 });
 
-app.get("/stats.jsonl", async (c) => {
+app.get("/stats.json", async (c) => {
   if (c.req.headers.get("Authorization") !== ADMIN_SECRET && c.req.query().authorization !== ADMIN_SECRET) return notFound();
   const res = await c.env.ASCELLA_DATA.get("stats.jsonl");
-  return c.text(await res?.text() || "", {
+  const txt = await res?.text();
+
+  return c.text("[" + (txt?.trim().split("\n").join(",") || "") + "]", {
     status: 200,
     headers: {
-      "Content-Type": "application/jsonl",
-      "cache-control": "public, max-age=31536000",
+      "Content-Type": "application/json",
+      "cache-control": "public, max-age=43200",
     }
   });
 })
