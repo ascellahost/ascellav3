@@ -18,9 +18,9 @@
 </script>
 
 <div class="p-4 rounded-sm">
-  <h2 class="text-xl font-bold text-center animate-bounce">Ascella.host config creator</h2>
+  <h2 class="animate-spin animate-bounce animate-ping animate-pulse text-xl font-bold text-center ">Ascella.host config creator</h2>
   <marquee>
-    <p class="font-bold">Here you can create a config for Ascella.host</p>
+    <p class="animate-spin animate-bounce animate-ping animate-pulse font-bold">Here you can create a config for Ascella.host</p>
   </marquee>
   <span class="text-red-950 bg-yellow-200">{error}</span>
   <form
@@ -79,13 +79,13 @@
       window.URL.revokeObjectURL(url);
     }}
   >
-    <div class="form-control w-full col-span-2">
+    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full col-span-2">
       <marquee direction="right" scrolldelay="2" scrollamount="2">
         <label>Select Domain</label>
       </marquee>
-      <div class="flex gap-2 w-full">
-        <input bind:value={config.subDomain} placeholder="subdomain" class="input input-primary rounded-sm" />
-        <select bind:value={config.domain} class="select select-primary rounded-sm" required>
+      <div class="animate-spin animate-bounce animate-ping animate-pulse flex gap-2 w-full">
+        <input bind:value={config.subDomain} placeholder="subdomain" class="animate-spin animate-bounce animate-ping animate-pulse input input-primary rounded-sm" />
+        <select bind:value={config.domain} class="animate-spin animate-bounce animate-ping animate-pulse select select-primary rounded-sm" required>
           {#await domains then domains}
             {#each domains as domain}
               <option selected={config.domain === domain.domain}>{domain.domain}</option>
@@ -101,25 +101,25 @@
         </div>
       {/if}
     </div>
-    <div class="form-control w-full my-2 col-span-2">
-      <label class="animate-pulse">Ascella token</label>
+    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-2">
+      <label class="animate-spin animate-bounce animate-ping animate-pulse animate-pulse">Ascella token</label>
       <p>
         A ascella token allows you to upload bigger files & keep a history of files you can obtain one from <a
           href="https://api.ascella.host/oauth/auth"
-          class="link link-primary link-hover"
+          class="animate-spin animate-bounce animate-ping animate-pulse link link-primary link-hover"
         >
           here
         </a> make sure to save it cause it regenerates each time you login
       </p>
-      <input bind:value={config.token} placeholder="ascella-token" class="input input-accent rounded-sm focus:translate-x-4" />
+      <input bind:value={config.token} placeholder="ascella-token" class="animate-spin animate-bounce animate-ping animate-pulse input input-accent rounded-sm focus:translate-x-4 " />
     </div>
-    <div class="form-control w-full col-span-2">
+    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full col-span-2">
       <p>Auto Delete Image days {config.days}</p>
-      <input bind:value={config.days} type="range" min="1" max="365" class="range range-secondary hover:range-primary duration-500" />
+      <input bind:value={config.days} type="range" min="1" max="365" class="animate-spin animate-bounce animate-ping animate-pulse range range-secondary hover:range-primary duration-500" />
     </div>
-    <div class="form-control w-full my-2 col-span-2">
-      <label class="animate-bounce">Url Style</label>
-      <select bind:value={config.style} class="select select-accent rounded-sm focus:select-ghost" required>
+    <div class="animate-spin animate-bounce animate-ping animate-pulse form-control w-full my-2 col-span-2">
+      <label class="animate-spin animate-bounce animate-ping animate-pulse ">Url Style</label>
+      <select bind:value={config.style} class="animate-spin animate-bounce animate-ping animate-pulse select select-accent rounded-sm focus:select-ghost" required>
         <option value="1">Default</option>
         <option value="2">Uuid</option>
         <option value="3">timestamp</option>
@@ -203,7 +203,7 @@
     <p class="col-span-2">
       On linux or mac without sharex? no problem try out <a
         href="https://github.com/ascellahost/gui"
-        class="link link-hover link-secondary"
+        class="animate-spin animate-bounce animate-ping animate-pulse link link-hover link-secondary"
         target="_blank">The desktop app</a
       >
     </p>
