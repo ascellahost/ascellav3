@@ -12,7 +12,8 @@
     {
       name: "Open Source",
       icon: OpenSource,
-      description: "Ascella is open source and free to use. You can view and contribute to the project on the <a href='https://github.com/ascellahost/ascellav3' class='link link-primary' target='_blank'>GitHub</a>.",
+      description:
+        "Ascella is open source and free to use. You can view and contribute to the project on the <a href='https://github.com/ascellahost/ascellav3' class='link link-primary' target='_blank'>GitHub</a>.",
     },
     {
       name: "Fast",
@@ -34,7 +35,8 @@
     {
       name: "Support",
       icon: Support,
-      description: "We have a great support team on our <a href='https://discord.gg/BDxd9AuHpr' class='link link-primary' target='_blank'>discord server</a> in case you ever run into any problems.",
+      description:
+        "We have a great support team on our <a href='https://discord.gg/BDxd9AuHpr' class='link link-primary' target='_blank'>discord server</a> in case you ever run into any problems.",
     },
     {
       name: "Compatibility",
@@ -48,7 +50,7 @@
   import File from "svelte-material-icons/File.svelte";
   import Domain from "svelte-material-icons/Domain.svelte";
   import Eye from "svelte-material-icons/Eye.svelte";
-  import User from "svelte-material-icons/FaceProfile.svelte";
+  import User from "svelte-material-icons/FaceAgent.svelte";
   import Storage from "svelte-material-icons/Harddisk.svelte";
   import Link from "svelte-material-icons/Link.svelte";
   const statIconsAndRenames = {
@@ -87,7 +89,7 @@
       </span>
       Create config
     </a>
-    <span class="w-max"></span>
+    <span class="w-max" />
   </div>
 
   <hr class="py-5 border-primary-content" />
