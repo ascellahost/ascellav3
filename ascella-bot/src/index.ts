@@ -5,6 +5,7 @@ import { DiscordChannel, DiscordInteraction, GuildFeatures } from "discordeno/ty
 import { InteractionTypes } from "discordeno/types";
 import { AscellaContext, commands, handleCommand } from "./commands/mod";
 import { initTables } from "../../src/orm";
+import { Toucan } from 'toucan-js';
 
 
 export const app = new Hono<{ Bindings: Bindings }>();
@@ -70,42 +71,52 @@ app
     });
 
 const scheduled = async (controller: any, env: Bindings, ctx: any) => {
+    const sentry = new Toucan({
+        dsn: SENTRY_DSN,
+        context: ctx,
 
+    });
     const qr = env.ASCELLA_DB.prepare(
         `SELECT ( SELECT COUNT(*) FROM files ) AS files, ( SELECT COUNT(*) FROM users ) AS users, ( SELECT COUNT(*) FROM users ) AS users, COUNT(*) as domains, ( SELECT COUNT(*) FROM reviews ) AS reviews, ( SELECT SUM(size) FROM files ) AS storageUsage, ( SELECT COUNT(*) FROM files WHERE type = 'redirect' ) AS redirects FROM domains LIMIT 1`
     );
     const record = await qr.first<Record<string, number>>();
-    let actx = new AscellaContext({} as DiscordInteraction, { env } as any);
+    try {
+        let actx = new AscellaContext({} as DiscordInteraction, { env } as any);
 
-    const channels = await actx.rest(`/guilds/${GUILD_ID}/channels`, {
-        method: "GET"
-    }).then(r => r.json()) as DiscordChannel[]
+        const channels = await actx.rest(`/guilds/${GUILD_ID}/channels`, {
+            method: "GET"
+        }).then(r => r.json()) as DiscordChannel[]
 
-    const orderedChannels = channels.filter(x => x.parent_id == GUILD_STATS_ID).sort((x, y) => {
-        return (x.position || 0) - (y.position || 0)
-    });
+        const orderedChannels = channels.filter(x => x.parent_id == GUILD_STATS_ID).sort((x, y) => {
+            return (x.position || 0) - (y.position || 0)
+        });
 
-    const list = [
-        `Files: ${record.files}`,
-        `Users: ${record.users}`,
-        `Domains: ${record.domains}`,
-        `Storage Usage: ${new Intl.NumberFormat("en", {
-            unit: "megabyte",
-            style: "unit",
-            unitDisplay: "short",
-            notation: "compact",
-        }).format((record.storageUsage / 1000000) | 0)}`,
-    ]
+        const list = [
+            `Files: ${record.files}`,
+            `Users: ${record.users}`,
+            `Domains: ${record.domains}`,
+            `Storage Usage: ${new Intl.NumberFormat("en", {
+                unit: "megabyte",
+                style: "unit",
+                unitDisplay: "short",
+                notation: "compact",
+            }).format((record.storageUsage / 1000000) | 0)}`,
+        ]
 
-    for (let i = 0; i < list.length; i++) {
-        if (orderedChannels[i].name == list[i]) continue;
-        await actx.rest(`/channels/${orderedChannels[i].id}`, {
-            method: "PATCH",
-            body: {
-                name: list[i],
-            }
-        })
+        for (let i = 0; i < list.length; i++) {
+            if (orderedChannels[i].name == list[i]) continue;
+            await actx.rest(`/channels/${orderedChannels[i].id}`, {
+                method: "PATCH",
+                body: {
+                    name: list[i],
+                }
+            })
+        }
+    } catch (e) {
+        console.log(e)
+        sentry.captureException(e)
     }
+
     if (controller.cron !== "30 0 * * *") {
         // normal hourly cron
         return
@@ -161,36 +172,41 @@ const scheduled = async (controller: any, env: Bindings, ctx: any) => {
     };
 
 
+    try {
+        const res = await fetch(`https://api.cloudflare.com/client/v4/graphql`, {
+            method: "POST",
+            headers: {
+                authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
+            },
+            body: JSON.stringify(body),
+        });
 
-    const res = await fetch(`https://api.cloudflare.com/client/v4/graphql`, {
-        method: "POST",
-        headers: {
-            authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
-        },
-        body: JSON.stringify(body),
-    });
+        const data = await res.json() as any;
 
-    const data = await res.json() as any;
+        const vv = data.data.viewer.zones[0].httpRequests1dGroups[0]
+        const r2 = data.data.viewer.accounts[0].r2StorageAdaptiveGroups[0]
+        const obj = {
+            date: date.toISOString().split("T")[0],
+            date_full: date.toISOString(),
+            date_ms: +date,
+            ...record,
+            ...vv.sum,
+            ...vv.uniq,
+            ...r2.max,
+        }
 
-    const vv = data.data.viewer.zones[0].httpRequests1dGroups[0]
-    const r2 = data.data.viewer.accounts[0].r2StorageAdaptiveGroups[0]
-    const obj = {
-        date: date.toISOString().split("T")[0],
-        date_full: date.toISOString(),
-        date_ms: +date,
-        ...record,
-        ...vv.sum,
-        ...vv.uniq,
-        ...r2.max,
+        const json = JSON.stringify(obj) + "\n";
+
+        const object = await env.ASCELLA_DATA.get("stats.jsonl")
+
+        const text = await object?.text() ?? ""
+        console.log(text + json)
+        console.log((text + json).split("\n").length)
+        await env.ASCELLA_DATA.put("stats.jsonl", text + json)
+    } catch (e) {
+        sentry.captureException(e)
     }
 
-    const json = JSON.stringify(obj) + "\n";
-
-    const object = await env.ASCELLA_DATA.get("stats.jsonl")
-
-    const text = await object?.text() ?? ""
-
-    await env.ASCELLA_DATA.put("stats.jsonl", text + json)
 }
 
 Object.assign(app, {

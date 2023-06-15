@@ -93,18 +93,12 @@ oauth.get("/callback", async (c) => {
     });
   }
 
+  return Response.redirect(`https://ascella.host/token?token=${user?.token}`, 302);
+
   // redirect user to front page with cookies set
   // const access_token_expires_in = new Date(Date.now() + response.expires_in); // 10 minutes
   // const refresh_token_expires_in = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   // console.log("redirect to / with cookies");
-  return new Response(`your Ascella access token is ${user?.token}`, {
-    // headers: {
-    //   "Set-Cookie": [
-    //     `access_token=${response.access_token}; Expires=${access_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-    //     `refresh_token=${response.refresh_token}; Expires=${refresh_token_expires_in.toUTCString()}; HttpOnly; Path=/`,
-    //   ].join(","),
-    // },
-  });
 });
 oauth.get("/refresh", async (c) => {
   let host = new URL(APP_URL).host;

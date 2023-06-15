@@ -21,26 +21,22 @@
   ],
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230404.0",
-    "@sinclair/typebox": "^0.28.4",
-    "@types/mime-types": "^2.1.1",
     "common": "workspace:./common",
     "d1-orm": "^0.7.2",
     "discord-interactions": "^3.3.0",
     "discordeno": "^18.0.1",
     "esbuild": "^0.17.17",
     "hono": "^3.1.6",
-    "mime-types": "^2.1.35",
     "miniflare": "^2.13.0",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4",
-    "ulid-workers": "^2.1.0",
     "wrangler": "^2.16.0"
   },
   "prettier": {
     "printWidth": 140
   },
-  "engines": {
-  },
+  "engines": {},
   "dependencies": {
+    "toucan-js": "^3.1.0"
   }
 }
