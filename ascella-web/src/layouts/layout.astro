@@ -20,6 +20,10 @@ const footerItems = [
     name: "DMCA",
     url: "/dmca",
   },
+  {
+    name: "Upload",
+    url: "/upload",
+  },
 ];
 
 import WeatherSunny from "svelte-material-icons/WeatherSunny.svelte";
@@ -40,11 +44,14 @@ const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><p
     <title>Ascella.host</title>
   </head>
   <body>
+    <slot name="portal" />
+    <div id="pp" class="fixed -z-10 top-o left-0 w-full h-full"></div>
+
     <head>
       <div>
         <div class="text-3xl flex absolute top-4 right-4">
           <span class="my-auto"><WeatherSunny /></span>
-          <span id="lightdark" class="text-5xl cursor-pointer" role="button" set:html={svgToggleSwitch} />
+          <span id="lightdark" class="text-5xl cursor-pointer" aria-label="Darkmode switch" role="button" set:html={svgToggleSwitch} />
           <span class="my-auto"><WeatherNight /></span>
         </div>
         <p class="text-5xl font-bold text-center p-10">
@@ -59,7 +66,7 @@ const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><p
           footerItems
             .flatMap((element: { url: string; name: string }) => [
               <li class="mx-3">
-                <a class="link link-hover link-primary" href={element.url}>
+                <a class="link link-hover link-primary" href={element.url} target={element.url.startsWith("http") ? "_blank" : "_self"}>
                   {element.name}
                 </a>
               </li>,
@@ -89,6 +96,127 @@ const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><p
       }
 
       lightdark.addEventListener("click", toggleDarkLight);
+    </script>
+    <script>
+      import "particles.js";
+      Object.deepExtend = function deepExtendFunction(destination, source) {
+        for (var property in source) {
+          if (source[property] && source[property].constructor && source[property].constructor === Object) {
+            destination[property] = destination[property] || {};
+            deepExtendFunction(destination[property], source[property]);
+          } else {
+            destination[property] = source[property];
+          }
+        }
+        return destination;
+      };
+
+      const config = {
+        particles: {
+          number: {
+            value: 1,
+            density: {
+              enable: true,
+              value_area: 500,
+            },
+          },
+          color: {
+            value: "#ffffff",
+          },
+          shape: {
+            type: "circle",
+            stroke: {
+              width: 0,
+              color: "#000000",
+            },
+            polygon: {
+              nb_sides: 5,
+            },
+          },
+          opacity: {
+            value: 0.5,
+            random: false,
+            anim: {
+              enable: false,
+              speed: 0.01,
+              opacity_min: 0.1,
+              sync: false,
+            },
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: {
+              enable: false,
+              speed: 40,
+              size_min: 0.1,
+              sync: false,
+            },
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.4,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: false,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: {
+              enable: false,
+              rotateX: 600,
+              rotateY: 1200,
+            },
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: true,
+              mode: "grab",
+            },
+            onclick: {
+              enable: true,
+              mode: "push",
+            },
+            resize: true,
+          },
+          modes: {
+            grab: {
+              distance: 400,
+              line_linked: {
+                opacity: 1,
+              },
+            },
+            bubble: {
+              distance: 400,
+              size: 40,
+              duration: 2,
+              opacity: 8,
+              speed: 3,
+            },
+            repulse: {
+              distance: 200,
+              duration: 0.4,
+            },
+            push: {
+              particles_nb: 4,
+            },
+            remove: {
+              particles_nb: 2,
+            },
+          },
+        },
+        retina_detect: true,
+      };
+      window.particlesJS("pp", config);
     </script>
   </body>
 </html>

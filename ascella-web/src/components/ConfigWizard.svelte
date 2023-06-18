@@ -1,6 +1,6 @@
 <script lang="ts">
   import DL from "svelte-material-icons/DownloadNetwork.svelte";
-  import { getConfig } from "../utils";
+  import { emptyConfig, getConfig, getHeadersFromConfig } from "../utils";
   let config: Record<string, any> = getConfig();
 
   const a = document.createElement("a");
@@ -10,9 +10,11 @@
   let uploadToDesktop = false;
 
   let error = "";
+
+  const save = () => localStorage.setItem("config", JSON.stringify(config));
 </script>
 
-<div class="p-4 rounded-sm">
+<div class=" rounded-sm">
   <h2 class="text-xl font-bold text-center">Ascella.host config creator</h2>
   <marquee>
     <p class="font-bold">Here you can create a config for Ascella.host</p>
@@ -21,31 +23,11 @@
   <form
     class="grid grid-cols-4 gap-4"
     on:submit|preventDefault={async (r) => {
-      localStorage.setItem("config", JSON.stringify(config));
-      const headers = {
-        "ascella-autodelete": config.days.toString(),
-        "ascella-style": config.style,
-        "ascella-token": config.token,
-        "ascella-domain": `${config.subDomain ? `${config.subDomain}.` : ""}${config.domain_custom ?? config.domain}`,
-        ...Object.fromEntries(
-          Object.entries(config.embed)
-            .filter((x) => x[1] !== "")
-            .map((x) => [`ascella-og-${x[0]}`, x[1]?.toString()])
-        ),
-      };
+      save();
 
       const file = {
-        Version: "14.0.0",
-        Name: "Ascella.host - Images",
-        DestinationType: "ImageUploader",
-        RequestMethod: "POST",
-        RequestURL: "https://api.ascella.host/api/v3/upload",
-        Headers: Object.fromEntries(Object.entries(headers).filter((x) => x[1] !== "")),
-        Body: "MultipartFormData",
-        FileFormName: "file",
-        URL: "{json:url}",
-        DeletionURL: "{json:deletion_url}",
-        ErrorMessage: "{json:error}",
+        ...emptyConfig,
+        Headers: getHeadersFromConfig(config),
       };
 
       if (uploadToDesktop) {
@@ -195,12 +177,16 @@
     <button name="xy-type" value="desktop" type="submit" class="btn btn-primary col-span-1" on:click={() => (uploadToDesktop = true)}>
       <span> Upload config to ascella desktop </span>
     </button>
+    <button type="button" on:click={save} class="col-span-4 link link-secondary link-hover text-left">No thanks just save it</button>
     <p class="col-span-2">
       On linux or mac without sharex? no problem try out <a
         href="https://github.com/ascellahost/gui"
         class="link link-hover link-secondary"
+        on:click={save}
         target="_blank">The desktop app</a
       >
     </p>
   </form>
+
+  <a href="/upload" on:click={save} class="link link-hover link-primary mt-4">Try it out online!</a>
 </div>

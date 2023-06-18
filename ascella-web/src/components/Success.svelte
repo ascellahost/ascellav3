@@ -40,7 +40,7 @@
 {/if}
 {#if urls}
   <div class="flex justify-center p-2">
-    <input class="input input-ghost mx-2" bind:this={input} on:input={(e) => (e.target.value = urls)} value={urls} />
+    <input class="input input-ghost mx-2 w-96" bind:this={input} on:input={(e) => (e.target.value = urls)} value={urls} />
     <button
       class="btn btn-ghost mx-2"
       on:click={() => {

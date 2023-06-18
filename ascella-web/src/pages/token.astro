@@ -12,7 +12,7 @@ export const prerender = true;
         <pre id="token"></pre>
     </div>
 
-    <script>
+    <script async type="module">
         import { getConfig } from "../utils";
         const token = new URLSearchParams(window.location.search).get("token");
         document.getElementById("token").innerHTML = token;
