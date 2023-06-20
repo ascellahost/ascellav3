@@ -4,9 +4,8 @@ import { extension } from "mime-types";
 import { authError, badRequest, basicData, basicResponse, internalError, notFound, serverError } from "./errors";
 import { genVanity } from "./urlStyle";
 import { Styles, UploadLimits } from "common/build/main";
-import { getHeaderDefaults, stringInject } from "./utils";
+import { getHeaderDefaults, getRandomVibrantHexColor, stringInject } from "./utils";
 import { getOrm } from "./orm";
-import { validator } from "hono/validator";
 import { InferFromColumns, DataTypes } from "d1-orm";
 
 export const api = new Hono<{ Bindings: Bindings }>();
@@ -41,7 +40,7 @@ api.get("/files/:vanity/delete/:delete", async (c) => {
       vanity,
     },
   });
-  return Response.json(basicData(202, "File deleted", true));
+  return Response.json(basicData(202, "File deleted", true),);
 });
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -133,6 +132,16 @@ api.get("/reviews.json", async (c) => {
     },
   });
 });
+function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return '0 Bytes';
+
+  const kilobyte = 1000;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(kilobyte));
+
+  const formattedBytes = (bytes / Math.pow(kilobyte, i)).toFixed(decimals < 0 ? 0 : decimals);
+  return `${formattedBytes} ${sizes[i]}`;
+}
 
 api.post("/upload", async (c) => {
   let { users, files: filesDb } = getOrm(c.env.ASCELLA_DB);
@@ -210,49 +219,56 @@ api.post("/upload", async (c) => {
     settings.ext ? `.${settings.ext}` : "",
   ].join("");
 
-  function convertBytesToMB(bytes: number) {
-    return bytes / (1024 * 1024);
-  }
-
-  const replaces: Record<string, string> = {
-    ip: c.req.headers.get("cf-connecting-ip"),
-    filename: file.name,
-    vanity: vanity,
-    size: file.size,
-    type: file.type,
-    size_fmt: convertBytesToMB(file.size),
-    extension: ext,
-    now: new Date(Date.now()).toISOString(),
-    ...settings,
-    ...settings.embed,
-    ...Object.fromEntries(c.req.headers.entries()),
-  };
-
-  let extraReplaces = c.req.headers.get("ascella-extra-replaces") == "true";
-  if (extraReplaces && user.uuid) {
-    let result: { images: number; size: number } = await c.env.ASCELLA_DB.prepare(
-      "select count(*) as images, SUM(size) as size from files where uploader = ? limit 1"
-    )
-      .bind([user.uuid])
-      .first();
-    replaces.images = result.images.toString();
-    replaces.size = result.size.toString();
-    replaces.size_fmt = convertBytesToMB(result.size).toString();
-  }
-
-  const embed = {
-    color: stringInject(settings.embed.color, replaces) ?? "",
-    title: stringInject(settings.embed.title, replaces),
-    description: stringInject(settings.embed.description, replaces),
-    sitename: stringInject(settings.embed.sitename, replaces),
-    sitenameUrl: (settings.embed.sitenameUrl as string) ?? "",
-    author: stringInject(settings.embed.author, replaces),
-    authorUrl: stringInject(settings.embed.authorUrl as string, replaces) ?? "",
-  };
 
   const raw = `${APP_URL}/cdn/${user.uuid}/${filename}`;
 
+  const replaces: Record<string, string> = {
+    ...settings,
+    ...settings.embed,
+    ...Object.fromEntries(c.req.headers.entries()),
+    ip: c.req.headers.get("cf-connecting-ip"),
+    filename: file.name,
+    vanity: vanity,
+    size: formatBytes(file.size),
+    type: file.type,
+    size_raw: file.size,
+    extension: ext,
+    now: new Date(Date.now()).toISOString(),
+    random_hex: getRandomVibrantHexColor(),
+    raw,
+  };
+
+
   let postResponse = async () => {
+
+    if (user.uuid) {
+      try {
+        let result: { images: number; size: number } = await c.env.ASCELLA_DB.prepare(
+          "select count(*) as images, SUM(size) as size from files where uploader = ? limit 1"
+        )
+          .bind(user.uuid)
+          .first();
+
+        replaces.total_images = result?.images?.toString();
+        replaces.total_size = formatBytes(result.size)
+        replaces.total_size_raw = result?.size?.toString();
+      } catch (e) {
+        //whatever
+      }
+
+    }
+
+    const embed = {
+      color: settings.embed.color.toLowerCase() === "random" ? getRandomVibrantHexColor() : stringInject(settings.embed.color, replaces) ?? "",
+      title: stringInject(settings.embed.title, replaces),
+      description: stringInject(settings.embed.description, replaces),
+      sitename: stringInject(settings.embed.sitename, replaces),
+      sitenameUrl: stringInject(settings.embed["sitename-url"], replaces) ?? "",
+      author: stringInject(settings.embed.author, replaces),
+      authorUrl: stringInject(settings.embed["author-url"], replaces) ?? "",
+    };
+
+
     let data = {
       name: filename,
       size: file.size,

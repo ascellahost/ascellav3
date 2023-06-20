@@ -33,6 +33,7 @@ export default {
         }
         const { embed } = rson;
         const meta = [
+          ["og:type", "website"],
           ["og:title", embed.title],
           ["description", embed.description],
           ["og:description", embed.description],
@@ -43,6 +44,7 @@ export default {
           ["og:author", embed.author],
           ["og:author-url", embed.authorUrl],
           ["og:image", rson.raw],
+          ["og:url", `https://ascella.host/v/${name}`],
           ["twitter:image:src", rson.raw],
           ["twitter:card", "summary_large_image"],
           ["viewport", "width=device-width, initial-scale=1"],
@@ -52,7 +54,7 @@ export default {
           .join("");
         const data =
           `<!DOCTYPE html><html lang="en">` +
-          `<head>${rson.embed.title && `<title>${rson.embed.title}</title>`}` +
+          `<head>${embed.title && `<title>${embed.title}</title>`}` +
           `<meta charset="UTF-8">` +
           `<meta http-equiv="X-UA-Compatible" content="IE=edge">${meta}` +
           `</head>` +
