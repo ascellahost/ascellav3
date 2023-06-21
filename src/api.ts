@@ -212,6 +212,7 @@ api.post("/upload", async (c) => {
   if (settings.url_style == Styles.filename) vanity = file.name;
   if (!vanity) return badRequest("Invalid url style");
   if (settings.domain == "ascella.host") settings.domain = "i.ascella.host";
+
   let url = [
     `https://${settings.domain}/`,
     settings.append ? encodeURIComponent(settings.append) + "/" : "",
@@ -240,60 +241,64 @@ api.post("/upload", async (c) => {
 
 
   let postResponse = async () => {
+    try {
 
-    if (user.uuid) {
-      try {
-        let result: { images: number; size: number } = await c.env.ASCELLA_DB.prepare(
-          "select count(*) as images, SUM(size) as size from files where uploader = ? limit 1"
-        )
-          .bind(user.uuid)
-          .first();
+      if (user.uuid) {
+        try {
+          let result: { images: number; size: number } = await c.env.ASCELLA_DB.prepare(
+            "select count(*) as images, SUM(size) as size from files where uploader = ? limit 1"
+          )
+            .bind(user.uuid)
+            .first();
 
-        replaces.total_images = result?.images?.toString();
-        replaces.total_size = formatBytes(result.size)
-        replaces.total_size_raw = result?.size?.toString();
-      } catch (e) {
-        //whatever
+          replaces.total_images = result?.images?.toString();
+          replaces.total_size = formatBytes(result.size)
+          replaces.total_size_raw = result?.size?.toString();
+        } catch (e) {
+          c.get("sentry").captureException(e)
+        }
       }
 
+
+      const embed = {
+        color: (settings?.embed?.color === "random" ? getRandomVibrantHexColor() : stringInject(settings.embed?.color, replaces)) ?? "",
+        title: stringInject(settings.embed?.title, replaces),
+        description: stringInject(settings.embed?.description, replaces),
+        sitename: stringInject(settings.embed?.sitename, replaces),
+        sitenameUrl: stringInject(settings.embed?.["sitename-url"], replaces) ?? "",
+        author: stringInject(settings.embed?.author, replaces),
+        authorUrl: stringInject(settings.embed?.["author-url"], replaces) ?? "",
+      };
+
+
+      const data = {
+        name: filename,
+        size: file.size,
+        type: file.type,
+        vanity: vanity,
+        upload_name: file.name,
+      };
+      if (user.uuid) {
+        //@ts-ignore -
+        data.uploader = user.uuid;
+      }
+
+      await filesDb.InsertOne(data);
+
+      await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
+        httpMetadata: {
+          contentType: file.type,
+        },
+        customMetadata: {
+          "expires-at": settings.autodelete ? (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000).toString() : "",
+          delete: del,
+          ip: c.req.headers.get("cf-connecting-ip") || "",
+          ...embed,
+        },
+      });
+    } catch (e) {
+      c.get("sentry").captureException(e)
     }
-
-    const embed = {
-      color: settings.embed.color.toLowerCase() === "random" ? getRandomVibrantHexColor() : stringInject(settings.embed.color, replaces) ?? "",
-      title: stringInject(settings.embed.title, replaces),
-      description: stringInject(settings.embed.description, replaces),
-      sitename: stringInject(settings.embed.sitename, replaces),
-      sitenameUrl: stringInject(settings.embed["sitename-url"], replaces) ?? "",
-      author: stringInject(settings.embed.author, replaces),
-      authorUrl: stringInject(settings.embed["author-url"], replaces) ?? "",
-    };
-
-
-    let data = {
-      name: filename,
-      size: file.size,
-      type: file.type,
-      vanity: vanity,
-      upload_name: file.name,
-    };
-    if (user.uuid) {
-      //@ts-ignore -
-      data.uploader = user.uuid;
-    }
-
-    await filesDb.InsertOne(data);
-
-    await c.env.ASCELLA_DATA.put(`${user.uuid}/${filename}`, file.stream(), {
-      httpMetadata: {
-        contentType: file.type,
-      },
-      customMetadata: {
-        "expires-at": settings.autodelete ? (Date.now() + settings.autodelete * 24 * 60 * 60 * 1000).toString() : "",
-        delete: del,
-        ip: c.req.headers.get("cf-connecting-ip") || "",
-        ...embed,
-      },
-    });
   };
 
   c.executionCtx.waitUntil(postResponse());

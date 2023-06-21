@@ -24,7 +24,7 @@ export let getHeaderDefaults = (user: Record<string, any>, headers: Headers) => 
 
   return defaults;
 };
-export function stringInject(str: string, data: Record<string, any>): string {
+export function stringInject(str: string | undefined, data: Record<string, any>): string {
   return (str ?? "").replace(/({([^}]+)})/g, function (i) {
     let key = i.replace(/{/, "").replace(/}/, "");
     if (data[key] == null) {

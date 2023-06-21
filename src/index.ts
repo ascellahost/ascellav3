@@ -7,7 +7,7 @@ import oauth from "./oauth";
 
 export const app = new Hono<{ Bindings: Bindings }>();
 
-if (!DEBUG) api.use("*", sentry({ dsn: SENTRY_DSN }));
+if (!DEBUG) app.use("*", sentry({ dsn: SENTRY_DSN }));
 
 app.get("/", async (c) => {
   Response.json(basicData(200, "Welcome to the Ascella API", true));
