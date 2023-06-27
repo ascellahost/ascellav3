@@ -17,7 +17,7 @@ export const getHeadersFromConfig = (config: any) => {
         "ascella-autodelete": config.days.toString(),
         "ascella-style": config.style,
         "ascella-token": config.token,
-        "ascella-domain": `${config.subDomain ? `${config.subDomain}.` : ""}${config.domain_custom ?? config.domain}`,
+        "ascella-domain": `${config.domain}`,
         ...Object.fromEntries(
             Object.entries(config.embed)
                 .filter((x) => x[1] !== "")
