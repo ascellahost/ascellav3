@@ -15,12 +15,14 @@
 
   let agreed_to_tos = false;
 
-  let domain = ""; // can be "custom" for a user defined domain, or a domain from the domains api
+  let domain = config.meta_domain; // can be "custom" for a user defined domain, or a domain from the domains api
 
-  let subdomain = ""; // the custom subdomain for a domain from the domains api
+  let subdomain = config.meta_subdomain; // the custom subdomain for a domain from the domains api
 
   function save(): void {
     console.log("saving config to localstorage");
+    config.meta_domain = domain
+    config.meta_subdomain = subdomain
     localStorage.setItem("config", JSON.stringify(config));
   }
 
