@@ -3,7 +3,7 @@ import Layout from "../layouts/layout.astro";
 export const prerender = true;
 ---
 
-<Layout>
+<Layout title="Token Success">
     <div class="text-center min-h-16">
         <h1 class="text-xl">
             Your token has been saved you can go to the <a href="/config_wizard" class="link link-primary link-hover">Config Wizard</a> to download
@@ -12,7 +12,7 @@ export const prerender = true;
         <pre id="token"></pre>
     </div>
 
-    <script async type="module">
+    <script>
         import { getConfig } from "../utils";
         const token = new URLSearchParams(window.location.search).get("token");
         document.getElementById("token").innerHTML = token;

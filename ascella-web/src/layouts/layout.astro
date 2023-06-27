@@ -31,6 +31,10 @@ import WeatherNight from "svelte-material-icons/WeatherNight.svelte";
 
 const svgToggleSwitch = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M17,15A3,3 0 0,1 14,12A3,3 0 0,1 17,9A3,3 0 0,1 20,12A3,3 0 0,1 17,15Z" fill="currentColor"></path></svg>`;
 const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M7,15A3,3 0 0,1 4,12A3,3 0 0,1 7,9A3,3 0 0,1 10,12A3,3 0 0,1 7,15Z" fill="currentColor"></path></svg>`;
+
+import { getRandomVibrantHexColor } from "../../../src/utils";
+
+const { title, description } = Astro.props;
 ---
 
 <html lang="en" class="bg-base-100" data-theme="yolo-dark">
@@ -40,8 +44,12 @@ const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><p
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="author" content="tricked & stef ❤️" />
-    <meta name="description" content="The fastest image uploader on the internet." />
-    <title>Ascella.host</title>
+    <meta name="description" content={description || "The fastest image uploader on the internet."} />
+    <meta name="color" content={getRandomVibrantHexColor()} />
+    <meta name="theme-color" content={getRandomVibrantHexColor()} />
+    <meta name="og:image" content="/banner2.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{title ? "Ascella - " + title : "Ascella.host"}</title>
   </head>
   <body>
     <slot name="portal" />

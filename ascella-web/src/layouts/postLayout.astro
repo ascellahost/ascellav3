@@ -1,8 +1,10 @@
 ---
 import Layout from "./layout.astro";
+
+const { title, description } = Astro.props.frontmatter;
 ---
 
-<Layout>
+<Layout {title} {description}>
   <div class="prose w-full mx-auto min-h-[40rem]">
     <slot />
   </div>
