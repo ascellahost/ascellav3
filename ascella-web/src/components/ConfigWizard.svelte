@@ -11,17 +11,19 @@
 
   let error = "";
 
+  let rule_acepptance = false;
+
   const save = () => localStorage.setItem("config", JSON.stringify(config));
 </script>
 
-<div class=" rounded-sm">
+<div class=" sm:max-w-full rounded-sm">
   <h2 class="text-xl font-bold text-center">Ascella.host config creator</h2>
   <marquee>
     <p class="font-bold">Here you can create a config for Ascella.host</p>
   </marquee>
   <span class="text-red-950 bg-yellow-200">{error}</span>
   <form
-    class="grid grid-cols-4 gap-4"
+    class="flex flex-wrap md:grid md:grid-cols-4 gap-4"
     on:submit|preventDefault={async (r) => {
       save();
 
@@ -41,7 +43,12 @@
           }
         } catch (e) {
           //@ts-ignore -
-          error = e.message;
+
+          if(e.message === "NetworkError when attempting to fetch resource."){
+              error = "Failed to connecting to the desktop app";
+          }else {
+            error = e.message;
+          }
         }
         uploadToDesktop = false;
         return;
@@ -61,7 +68,7 @@
         <label>Select Domain</label>
       </marquee>
       <div class="flex gap-2 w-full">
-        <input bind:value={config.subDomain} placeholder="subdomain" class="input input-primary rounded-sm" />
+        <input disabled={config.domain === "custom"} bind:value={config.subDomain} placeholder="subdomain" class="input input-primary rounded-sm" />
         <select bind:value={config.domain} class="select select-primary rounded-sm" required>
           {#await domains then domains}
             {#each domains as domain}
@@ -73,8 +80,8 @@
       </div>
       {#if config.domain === "custom"}
         <div class="form-control w-full my-2 col-span-2">
-          <label class="animate-pulse">Custom Domain</label>
-          <input bind:value={config.domain_custom} placeholder="domain" class="input input-accent rounded-sm focus:translate-x-4" />
+          <label class="animate-pulse"><a href="/custom-domain-help" class="underline">How to set up your domain for Ascella</a></label>
+          <input bind:value={config.domain_custom} placeholder="your.domain.com" class="input input-accent rounded-sm focus:translate-x-4" />
         </div>
       {/if}
     </div>
@@ -92,7 +99,7 @@
     </div>
     <div class="form-control w-full col-span-2">
       <p>Auto Delete Image days {config.days}</p>
-      <input bind:value={config.days} type="range" min="1" max="365" class="range range-secondary hover:range-primary duration-500" />
+      <input aria-label="Auto delete days silder" bind:value={config.days} type="range" min="1" max="365" class="range range-secondary hover:range-primary duration-500" />
     </div>
     <div class="form-control w-full my-2 col-span-2">
       <label class="animate-ping animate-pulse">Url Style</label>
@@ -164,22 +171,23 @@
       </div>
     </details>
 
-    <div class="form-control w-full my-2 flex col-span-4">
-      <label class="cursor-pointer label w-52">
-        <input type="checkbox" class="checkbox checkbox-error" />
-        <span class="label-text"> <a href="/rules">I accept the ascella rules</a></span>
+    <div class="w-full col-span-4">
+      <label class="cursor-pointer max-w-2xl ">
+        <input bind={rule_acepptance} type="checkbox" class="checkbox border-gray-400 ease-in-out duration-400 transition-colors checkbox-error" />
+        <span class="label-text"> I accept the ascella <a href="/rules" target="_blank" class="underline">rules</a></span>
       </label>
     </div>
-    <button type="submit" class="btn btn-primary col-span-3">
+    <button disabled={rule_acepptance === true} type="submit" class="btn btn-primary col-span-3">
       <span class="animate-ping"><DL /></span>
-      <span> Download </span>
+      <span> Download Config (.sxcu) </span>
     </button>
-    <button name="xy-type" value="desktop" type="submit" class="btn btn-primary col-span-1" on:click={() => (uploadToDesktop = true)}>
+    <button disabled={rule_acepptance} name="xy-type" value="desktop" type="submit" class="btn btn-primary col-span-1" on:click={() => (uploadToDesktop = true)}>
       <span> Upload config to ascella desktop </span>
     </button>
-    <button type="button" on:click={save} class="col-span-4 link link-secondary link-hover text-left">No thanks just save it</button>
+    <button disabled={rule_acepptance} type="button" on:click={save} class="col-span-4 link link-secondary link-hover text-left">No thanks just save it</button>
     <p class="col-span-2">
-      On linux or mac without sharex? no problem try out <a
+      On linux or mac without sharex? no problem try out
+      <a
         href="https://github.com/ascellahost/gui"
         class="link link-hover link-secondary"
         on:click={save}
