@@ -26,6 +26,8 @@ const footerItems = [
   },
 ];
 
+import { pwaInfo } from 'virtual:pwa-info';
+
 import WeatherSunny from "svelte-material-icons/WeatherSunny.svelte";
 import WeatherNight from "svelte-material-icons/WeatherNight.svelte";
 
@@ -50,6 +52,7 @@ const { title, description } = Astro.props;
     <meta name="og:image" content="/banner2.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title ? "Ascella - " + title : "Ascella.host"}</title>
+    { pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} /> }
   </head>
   <body>
     <slot name="portal" />
