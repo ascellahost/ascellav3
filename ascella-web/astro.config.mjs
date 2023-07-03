@@ -43,6 +43,18 @@ export default defineConfig({
             type: 'image/png',
           }
         ],
+        file_handlers: [
+          {
+            action: '/upload',
+            name: 'Upload image',
+            accept: {
+              'image/png': ['.png'],
+              'image/jpeg': ['.jpg', '.jpeg'],
+              'image/gif': ['.gif'],
+              'image/webp': ['.webp']
+            }
+          }
+        ]
       },
       workbox: {
         navigateFallback: '/404',
