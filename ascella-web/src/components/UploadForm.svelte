@@ -16,9 +16,17 @@
 
   onMount(() => {
     if ("launchQueue" in window) {
-      window.launchQueue.setConsumer((launchParams) => {
+      window.launchQueue.setConsumer(async (launchParams) => {
         if (launchParams.files && launchParams.files.length) {
-          updateButton(launchParams.files);
+
+          const fileArr = []
+          for (const file of launchParams.files) {
+            const blob = await file.getFile();
+            blob.handle = file
+            fileArr.push(blob)
+          }
+
+          updateButton(fileArr);
         }
       });
     }
@@ -60,7 +68,7 @@
   }
 
 
-  function updateButton(filesUpdate: FileList) {
+  function updateButton(filesUpdate) {
     uploadDisabled = !filesUpdate || progress !== -1;
     if (filesUpdate.length >= 1) {
 
