@@ -40,9 +40,14 @@ const { title, description } = Astro.props;
   <meta name="og:image" content="/banner2.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <title>{title ? "Ascella - " + title : "Ascella.host" }</title>
-    <script  type="module" src="/src/pwa.ts" defer></script>
-  {pwaInfo &&
-    <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+  <link rel="manifest" href="/manifest.json" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register(
+        import.meta.env.MODE === 'production' ? '/service-worker.js' : '/dev-sw.js?dev-sw'
+      )
+    }
+  </script>
 </head>
 <body>
 <div class="relative">
@@ -90,7 +95,6 @@ const { title, description } = Astro.props;
     </ul>
   </footer>
 </div>
-
 
 <script define:vars={{ svgToggleSwitch, svgToggleSwitchOff }} async type="module">
   const lightdark = document.getElementById("lightdark");

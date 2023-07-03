@@ -15,55 +15,17 @@ export default defineConfig({
     mdx(),
     htmlMinify(),
     AstroPWA({
-      mode: 'development',
-      base: '/',
-      scope: '/',
-      includeAssets: ['favicon.svg'],
-      registerType: 'autoUpdate',
-      manifest: {
-        name: 'Ascella the image uploader',
-        short_name: 'Ascella',
-        theme_color: '#ffffff',
-        start_url: '/',
-        id: 'host.ascella',
-        display: 'standalone',
-        scope: '/',
-        categories: ['media', 'images', 'upload'],
-        description: 'Ascella is a simple image uploader, with native and web support.',
-        prefer_related_applications: false,
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          }
-        ],
-        file_handlers: [
-          {
-            action: '/upload',
-            name: 'Upload image',
-            accept: {
-              'image/png': ['.png'],
-              'image/jpeg': ['.jpg', '.jpeg'],
-              'image/gif': ['.gif'],
-              'image/webp': ['.webp']
-            }
-          }
-        ]
-      },
-      workbox: {
-        navigateFallback: '/404',
-        globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
+      srcDir: 'src',
+      filename: 'pwa.js',
+      strategies: 'injectManifest',
+      injectRegister: false,
+      injectManifest: {
+        injectionPoint: undefined,
       },
       devOptions: {
         enabled: true,
-        navigateFallbackAllowlist: [/^\/404$/],
-      },
+        type: "module"
+      }
     })
   ],
   output: "server",

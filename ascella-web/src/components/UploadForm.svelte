@@ -14,7 +14,7 @@
 
   let sizePreview = "";
 
-  onMount(() => {
+  onMount(async () => {
     if ("launchQueue" in window) {
       window.launchQueue.setConsumer(async (launchParams) => {
         if (launchParams.files && launchParams.files.length) {
@@ -29,6 +29,17 @@
           updateButton(fileArr);
         }
       });
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has('receiving-file-share')) {
+      const uuid = urlParams.get('uuid')
+      const cache = await caches.open('ascella')
+      const cacheKey = new Request(`/upload/${uuid}`)
+      const file = await cache.match(cacheKey)
+      updateButton([await file.blob()])
+      await cache.delete(cacheKey)
     }
 
     window.onbeforeunload = s => (fileInputElement.value && progress <= 99) ? "" : null;
