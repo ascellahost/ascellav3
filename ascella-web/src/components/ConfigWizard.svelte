@@ -21,6 +21,7 @@
 
   function save(): void {
     console.log("saving config to localstorage");
+    error = "Config Saved"
     config.meta_domain = domain
     config.meta_subdomain = subdomain
     localStorage.setItem("config", JSON.stringify(config));
@@ -87,6 +88,13 @@
   }
 
 
+  // make `error` disappear after 5 seconds
+  $: if (error) {
+    setTimeout(() => {
+      error = "";
+    }, 2500);
+  }
+
 </script>
 
 <div class=" sm:max-w-full rounded-sm">
@@ -94,7 +102,14 @@
   <marquee>
     <p class="font-bold">Create a config for Ascella.host now!!</p>
   </marquee>
-  <div class="flex mh-12 justify-center min-w-full text-red-950 bg-yellow-200 transition-all">{error}</div>
+<!--  <div class="flex mh-12 justify-center min-w-full text-red-950 bg-yellow-200 ">{error}</div>-->
+  {#if error}
+    <div class="toast">
+      <div class="alert alert-info">
+        {error}
+      </div>
+    </div>
+  {/if}
   <form
     on:change={()=>{save()}}
     class="flex flex-wrap md:grid md:grid-cols-4 gap-4"
@@ -291,7 +306,7 @@
         The desktop app <OpenInNew class="inline-block align-middle " />
       </a>
     </p>
-    <a href="/upload" on:click={save} class="link link-hover link-primary font-extrabold text-xl">Or try the web version <OpenInNew class="inline-block align-middle " /></a>
+    <a href="/upload" on:click={save} class="link link-hover link-primary font-extrabold text-xl">Or try the web client <OpenInNew class="inline-block align-middle " /></a>
   </div>
 
 </div>

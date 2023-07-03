@@ -21,29 +21,27 @@ export default defineConfig({
       includeAssets: ['favicon.svg'],
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Ascella the image uplaoder',
+        name: 'Ascella the image uploader',
         short_name: 'Ascella',
         theme_color: '#ffffff',
         start_url: '/',
+        id: 'host.ascella',
         display: 'standalone',
+        scope: '/',
+        categories: ['media', 'images', 'upload'],
+        description: 'Ascella is a simple image uploader, with native and web support.',
         prefer_related_applications: false,
         icons: [
           {
-            src: 'pwa-192x192.avif',
+            src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/avif',
+            type: 'image/png',
           },
           {
-            src: 'pwa-512x512.avif',
+            src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/avif',
-          },
-          {
-            src: 'pwa-512x512.avif',
-            sizes: '512x512',
-            type: 'image/avif',
-            purpose: 'any maskable',
-          },
+            type: 'image/png',
+          }
         ],
       },
       workbox: {

@@ -136,6 +136,9 @@ importers:
       tsparticles:
         specifier: ^2.10.1
         version: 2.10.1
+      workbox-window:
+        specifier: ^7.0.0
+        version: 7.0.0
     devDependencies:
       '@astrojs/cloudflare':
         specifier: ^6.5.1
@@ -2812,7 +2815,6 @@ packages:
 
   /@types/trusted-types@2.0.3:
     resolution: {integrity: sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==}
-    dev: true
 
   /@types/unist@2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
@@ -7745,7 +7747,6 @@ packages:
 
   /workbox-core@7.0.0:
     resolution: {integrity: sha512-81JkAAZtfVP8darBpfRTovHg8DGAVrKFgHpOArZbdFd78VqHr5Iw65f2guwjE2NlCFbPFDoez3D3/6ZvhI/rwQ==}
-    dev: true
 
   /workbox-expiration@7.0.0:
     resolution: {integrity: sha512-MLK+fogW+pC3IWU9SFE+FRStvDVutwJMR5if1g7oBJx3qwmO69BNoJQVaMXq41R0gg3MzxVfwOGKx3i9P6sOLQ==}
@@ -7822,7 +7823,6 @@ packages:
     dependencies:
       '@types/trusted-types': 2.0.3
       workbox-core: 7.0.0
-    dev: true
 
   /wrangler@2.20.0:
     resolution: {integrity: sha512-UdKJ2LD7qgDxDvll/GkR1HnRP+bcEdqi/HJjDI+7eF4lv9V940jmm3orxCkSEosGyE14q0q6dBRM95+fBI8tdQ==}

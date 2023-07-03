@@ -67,7 +67,7 @@
   <div class="flex flex-wrap gap-2 mx-auto px-auto justify-center mb-10">
     {#each features as feature}
       <div class="feature w-80 bg-base-200 p-4 rounded">
-        <div class="">
+        <div>
           <h2 class="flex leading-none text-3xl mb-2 font-bold">
             <span class="mr-1"><svelte:component this={feature.icon} height="1em" /></span>
             {feature.name}
@@ -82,47 +82,50 @@
       </div>
     {/each}
   </div>
-  <div class="flex">
+
+  <div class="">
     <a href="/config_wizard" class="link link-primary text-3xl my-3 no-underline flex">
       <span class="my-auto">
         <ArrowRight />
       </span>
       Create config
     </a>
-    <span class="w-max" />
   </div>
 
-  <hr class="py-5 border-primary-content" />
-  <div>
-    <h2 class="text-3xl font-bold m-2">Stats</h2>
-    <div class="flex gap-2">
-      {#each Object.entries(stats).filter((x) => statIconsAndRenames[x[0]]) as [key, value]}
-        <div class="stat w-80 bg-base-200 p-4 rounded">
-          <div class="flex">
-            <h2 class="flex leading-none mb-2 gap-1">
-              <svelte:component this={statIconsAndRenames[key][1]} height="1em" />
-              {statIconsAndRenames[key][0]}
-            </h2>
+  <hr class="py-5 border-primary-content"  />
+
+  <div class="flex justify-center">
+    <div class="max-w-[1280px] w-fit">
+      <h2 class="ml-2 text-3xl font-bold">Stats</h2>
+      <div class="flex flex-wrap justify-center gap-2">
+        {#each Object.entries(stats).filter((x) => statIconsAndRenames[x[0]]) as [key, value]}
+          <div class="stat max-w-max min-w-fit bg-base-200 rounded">
+            <div class="flex">
+              <h2 class="flex leading-none gap-1">
+                <svelte:component this={statIconsAndRenames[key][1]} height="1em" />
+                {statIconsAndRenames[key][0]}
+              </h2>
+            </div>
+            <div class="description font-bold text-3xl">
+              <p>
+                {#if statIconsAndRenames[key][2] === true}
+                  {new Intl.NumberFormat("en", {
+                    unit: "megabyte",
+                    style: "unit",
+                    unitDisplay: "short",
+                    notation: "compact",
+                  }).format((value / 1000000) | 0)}
+                {:else}
+                  {new Intl.NumberFormat("en", {
+                    notation: "compact",
+                  }).format(value)}
+                {/if}
+              </p>
+            </div>
           </div>
-          <div class="description font-bold text-3xl">
-            <p>
-              {#if statIconsAndRenames[key][2] == true}
-                {new Intl.NumberFormat("en", {
-                  unit: "megabyte",
-                  style: "unit",
-                  unitDisplay: "short",
-                  notation: "compact",
-                }).format((value / 1000000) | 0)}
-              {:else}
-                {new Intl.NumberFormat("en", {
-                  notation: "compact",
-                }).format(value)}
-              {/if}
-            </p>
-          </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
     </div>
   </div>
-  <hr class="py-5 mt-10 border-primary-content" />
+  <hr class="py-5 mt-10 border-primary-content max-w-full mx-1" />
 </div>

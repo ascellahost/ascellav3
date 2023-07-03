@@ -1,35 +1,23 @@
 ---
-const footerItems = [
-  {
-    name: "Discord",
-    url: "https://discord.gg/BDxd9AuHpr",
-  },
-  {
-    name: "Github",
-    url: "https://github.com/ascellahost/ascellav3",
-  },
-  {
-    name: "Privacy",
-    url: "/privacy",
-  },
-  {
-    name: "Rules",
-    url: "/rules",
-  },
-  {
-    name: "DMCA",
-    url: "/dmca",
-  },
-  {
-    name: "Upload",
-    url: "/upload",
-  },
-];
+const footerItems = [{
+  name: "Discord", url: "https://discord.gg/BDxd9AuHpr"
+}, {
+  name: "Github", url: "https://github.com/ascellahost/ascellav3"
+}, {
+  name: "Privacy", url: "/privacy"
+}, {
+  name: "Rules", url: "/rules"
+}, {
+  name: "DMCA", url: "/dmca"
+}, {
+  name: "Upload", url: "/upload"
+}];
 
-import { pwaInfo } from 'virtual:pwa-info';
+import { pwaInfo } from "virtual:pwa-info";
 
 import WeatherSunny from "svelte-material-icons/WeatherSunny.svelte";
 import WeatherNight from "svelte-material-icons/WeatherNight.svelte";
+import PWAInstall from "../components/PWAInstall.svelte";
 
 const svgToggleSwitch = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M17,15A3,3 0 0,1 14,12A3,3 0 0,1 17,9A3,3 0 0,1 20,12A3,3 0 0,1 17,15Z" fill="currentColor"></path></svg>`;
 const svgToggleSwitchOff = `<svg width="1em" height="1em" viewBox="0 0 24 24"><path d="M17,7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7M7,15A3,3 0 0,1 4,12A3,3 0 0,1 7,9A3,3 0 0,1 10,12A3,3 0 0,1 7,15Z" fill="currentColor"></path></svg>`;
@@ -40,194 +28,165 @@ const { title, description } = Astro.props;
 ---
 
 <html lang="en" class="bg-base-100" data-theme="yolo-dark">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <meta name="author" content="tricked & stef ❤️" />
+  <meta name="description" content={description || "The fastest image uploader on the internet."} />
+  <meta name="color" content={getRandomVibrantHexColor()} />
+  <meta name="theme-color" content={getRandomVibrantHexColor()} />
+  <meta name="og:image" content="/banner2.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>{title ? "Ascella - " + title : "Ascella.host" }</title>
+    <script  type="module" src="/src/pwa.ts" defer></script>
+  {pwaInfo &&
+    <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+</head>
+<body>
+<div class="relative">
+  <div class="text-3xl flex absolute top-0 right-0">
+    <span class="my-auto"><WeatherSunny /></span>
+    <span id="lightdark" class="text-5xl cursor-pointer" aria-label="Darkmode switch" role="button"
+          set:html={svgToggleSwitch} />
+    <span class="my-auto"><WeatherNight /></span>
+    <PWAInstall client:load />
+  </div>
+</div>
+
+<div id="pp" class="fixed -z-10 top-o left-0 w-full h-full"></div>
+
+
+<div class="grid w-full min-w-full">
+
+  <slot name="portal" />
+
   <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="author" content="tricked & stef ❤️" />
-    <meta name="description" content={description || "The fastest image uploader on the internet."} />
-    <meta name="color" content={getRandomVibrantHexColor()} />
-    <meta name="theme-color" content={getRandomVibrantHexColor()} />
-    <meta name="og:image" content="/banner2.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <title>{title ? "Ascella - " + title : "Ascella.host"}</title>
-    { pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} /> }
+    <p class="text-5xl font-bold text-center p-10 w-full">
+      <a class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-content select-none" href="/">
+        Ascella.host
+      </a>
+    </p>
   </head>
-  <body>
-    <slot name="portal" />
-    <div id="pp" class="fixed -z-10 top-o left-0 w-full h-full"></div>
-
-    <head>
-      <div>
-        <div class="text-3xl flex absolute top-4 right-4">
-          <span class="my-auto"><WeatherSunny /></span>
-          <span id="lightdark" class="text-5xl cursor-pointer" aria-label="Darkmode switch" role="button" set:html={svgToggleSwitch} />
-          <span class="my-auto"><WeatherNight /></span>
-        </div>
-        <p class="text-5xl font-bold text-center p-10">
-          <a class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-content select-none" href="/">Ascella.host</a>
-        </p>
-      </div>
-    </head>
+  <main class="">
     <slot />
-    <footer class="mt-2 max-w-[70rem] mx-auto">
-      <ul class="flex flex-wrap pb-10 justify-center">
-        {
-          footerItems
-            .flatMap((element: { url: string; name: string }) => [
-              <li class="mx-3">
-                <a class="link link-hover link-primary" href={element.url} target={element.url.startsWith("http") ? "_blank" : "_self"}>
-                  {element.name}
-                </a>
-              </li>,
-              <li role="presentation">
-                <span>{"/"}</span>
-              </li>,
-            ])
-            .slice(0, -1)
-        }
-      </ul>
-    </footer>
-    <script define:vars={{ svgToggleSwitch, svgToggleSwitchOff }} async type="module">
-      const lightdark = document.getElementById("lightdark");
-      let theme = localStorage.getItem("theme") || "yolo-dark";
+  </main>
 
-      const setTheme = (data) => {
-        lightdark.innerHTML = data === "yolo-dark" ? svgToggleSwitch : svgToggleSwitchOff;
-        document.documentElement.setAttribute("data-theme", data);
-        localStorage.setItem("theme", data);
-        theme = data;
-      };
+  <footer class="mt-2 mx-auto">
+    <ul class="flex flex-wrap pb-10 justify-center">
+      {footerItems
+        .flatMap((element: { url: string; name: string }) => [
+          <li class="mx-3">
+            <a class="link link-hover link-primary" href={element.url}
+               target={element.url.startsWith("http") ? "_blank" : "_self"}>
+              {element.name}
+            </a>
+          </li>,
+          <li role="presentation">
+            <span>{"/"}</span>
+          </li>])
+        .slice(0, -1)}
+    </ul>
+  </footer>
+</div>
 
-      setTheme(theme);
 
-      function toggleDarkLight() {
-        setTheme(theme === "yolo-dark" ? "yolo-light" : "yolo-dark");
+<script define:vars={{ svgToggleSwitch, svgToggleSwitchOff }} async type="module">
+  const lightdark = document.getElementById("lightdark");
+  let theme = localStorage.getItem("theme") || "yolo-dark";
+
+  const setTheme = (data) => {
+    lightdark.innerHTML = data === "yolo-dark" ? svgToggleSwitch : svgToggleSwitchOff;
+    document.documentElement.setAttribute("data-theme", data);
+    localStorage.setItem("theme", data);
+    theme = data;
+  };
+
+  setTheme(theme);
+
+  function toggleDarkLight() {
+    setTheme(theme === "yolo-dark" ? "yolo-light" : "yolo-dark");
+  }
+
+  lightdark.addEventListener("click", toggleDarkLight);
+</script>
+<script>
+  import "particles.js";
+
+  Object.deepExtend = function deepExtendFunction(destination, source) {
+    for (var property in source) {
+      if (source[property] && source[property].constructor && source[property].constructor === Object) {
+        destination[property] = destination[property] || {};
+        deepExtendFunction(destination[property], source[property]);
+      } else {
+        destination[property] = source[property];
       }
+    }
+    return destination;
+  };
 
-      lightdark.addEventListener("click", toggleDarkLight);
-    </script>
-    <script>
-      import "particles.js";
-      Object.deepExtend = function deepExtendFunction(destination, source) {
-        for (var property in source) {
-          if (source[property] && source[property].constructor && source[property].constructor === Object) {
-            destination[property] = destination[property] || {};
-            deepExtendFunction(destination[property], source[property]);
-          } else {
-            destination[property] = source[property];
-          }
+  const config = {
+    particles: {
+      number: {
+        value: 1, density: {
+          enable: true, value_area: 500
         }
-        return destination;
-      };
-
-      const config = {
-        particles: {
-          number: {
-            value: 1,
-            density: {
-              enable: true,
-              value_area: 500,
-            },
-          },
-          color: {
-            value: "#ffffff",
-          },
-          shape: {
-            type: "circle",
-            stroke: {
-              width: 0,
-              color: "#000000",
-            },
-            polygon: {
-              nb_sides: 5,
-            },
-          },
-          opacity: {
-            value: 0.5,
-            random: false,
-            anim: {
-              enable: false,
-              speed: 0.01,
-              opacity_min: 0.1,
-              sync: false,
-            },
-          },
-          size: {
-            value: 3,
-            random: true,
-            anim: {
-              enable: false,
-              speed: 40,
-              size_min: 0.1,
-              sync: false,
-            },
-          },
-          line_linked: {
-            enable: true,
-            distance: 150,
-            color: "#ffffff",
-            opacity: 0.4,
-            width: 1,
-          },
-          move: {
-            enable: true,
-            speed: 2,
-            direction: "none",
-            random: false,
-            straight: false,
-            out_mode: "out",
-            bounce: false,
-            attract: {
-              enable: false,
-              rotateX: 600,
-              rotateY: 1200,
-            },
-          },
-        },
-        interactivity: {
-          detect_on: "canvas",
-          events: {
-            onhover: {
-              enable: true,
-              mode: "grab",
-            },
-            onclick: {
-              enable: true,
-              mode: "push",
-            },
-            resize: true,
-          },
-          modes: {
-            grab: {
-              distance: 400,
-              line_linked: {
-                opacity: 1,
-              },
-            },
-            bubble: {
-              distance: 400,
-              size: 40,
-              duration: 2,
-              opacity: 8,
-              speed: 3,
-            },
-            repulse: {
-              distance: 200,
-              duration: 0.4,
-            },
-            push: {
-              particles_nb: 4,
-            },
-            remove: {
-              particles_nb: 2,
-            },
-          },
-        },
-        retina_detect: true,
-      };
-      window.particlesJS("pp", config);
-    </script>
-  </body>
+      }, color: {
+        value: "#ffffff"
+      }, shape: {
+        type: "circle", stroke: {
+          width: 0, color: "#000000"
+        }, polygon: {
+          nb_sides: 5
+        }
+      }, opacity: {
+        value: 0.5, random: false, anim: {
+          enable: false, speed: 0.01, opacity_min: 0.1, sync: false
+        }
+      }, size: {
+        value: 3, random: true, anim: {
+          enable: false, speed: 40, size_min: 0.1, sync: false
+        }
+      }, line_linked: {
+        enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1
+      }, move: {
+        enable: true,
+        speed: 2,
+        direction: "none",
+        random: false,
+        straight: false,
+        out_mode: "out",
+        bounce: false,
+        attract: {
+          enable: false, rotateX: 600, rotateY: 1200
+        }
+      }
+    }, interactivity: {
+      detect_on: "canvas", events: {
+        onhover: {
+          enable: true, mode: "grab"
+        }, onclick: {
+          enable: true, mode: "push"
+        }, resize: true
+      }, modes: {
+        grab: {
+          distance: 400, line_linked: {
+            opacity: 1
+          }
+        }, bubble: {
+          distance: 400, size: 40, duration: 2, opacity: 8, speed: 3
+        }, repulse: {
+          distance: 200, duration: 0.4
+        }, push: {
+          particles_nb: 4
+        }, remove: {
+          particles_nb: 2
+        }
+      }
+    }, retina_detect: true
+  };
+  window.particlesJS("pp", config);
+</script>
+</body>
 </html>
