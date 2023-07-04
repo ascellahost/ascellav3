@@ -43,9 +43,7 @@ const { title, description } = Astro.props;
   <link rel="manifest" href="/manifest.json" />
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register(
-        import.meta.env.MODE === 'production' ? '/service-worker.js' : '/dev-sw.js?dev-sw'
-      )
+      navigator.serviceWorker.register('/pwa.js')
     }
   </script>
 </head>

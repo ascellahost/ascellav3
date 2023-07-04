@@ -2,6 +2,8 @@
 let image = Astro.params.image as string;
 let result = await fetch(`https://api.ascella.host/api/v3/files/${image}`).then((r) => r.json());
 if (!result.raw) {
+
+
   return Astro.redirect("/", 307);
 }
 const { embed } = result;

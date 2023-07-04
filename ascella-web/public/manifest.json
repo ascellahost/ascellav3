@@ -27,7 +27,7 @@
   ],
   "file_handlers": [
     {
-      "action": "/upload",
+      "action": "/upload?file-handler=1",
       "name": "Upload image",
       "accept": {
         "image/png": [

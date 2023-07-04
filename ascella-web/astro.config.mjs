@@ -13,20 +13,7 @@ export default defineConfig({
     svelte(),
     tailwind(),
     mdx(),
-    htmlMinify(),
-    AstroPWA({
-      srcDir: 'src',
-      filename: 'pwa.js',
-      strategies: 'injectManifest',
-      injectRegister: false,
-      injectManifest: {
-        injectionPoint: undefined,
-      },
-      devOptions: {
-        enabled: true,
-        type: "module"
-      }
-    })
+    htmlMinify()
   ],
   output: "server",
   adapter: cloudflare({

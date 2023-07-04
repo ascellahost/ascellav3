@@ -32,7 +32,7 @@ self.addEventListener("fetch", (event) => {
 
     event.respondWith(Response.redirect('/upload?receiving-file-share=1&uuid=' + newUuid));
 
-    self.waitUntil(promiseChain());
+    event.waitUntil(promiseChain());
   } else {
     event.respondWith(fetch(event.request));
   }
