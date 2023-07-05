@@ -21,12 +21,14 @@
 
   function save(): void {
     console.log("saving config to localstorage");
-    config.meta_domain = domain;
-    config.meta_subdomain = subdomain;
+    error = "Config Saved"
+    config.meta_domain = domain
+    config.meta_subdomain = subdomain
     localStorage.setItem("config", JSON.stringify(config));
   }
 
   async function submit(): Promise<void> {
+
     error = "";
 
     // check if the user has accepted the rules
@@ -51,14 +53,14 @@
     // download or upload the config
     const file = {
       ...emptyConfig,
-      Headers: getHeadersFromConfig(config),
+      Headers: getHeadersFromConfig(config)
     };
 
     if (uploadToDesktop) {
       try {
         const result = await fetch("http://localhost:3234", {
           method: "POST",
-          body: JSON.stringify(file),
+          body: JSON.stringify(file)
         });
         if (!result.ok) {
           error = `${result.status} : ${result.statusText}`;
@@ -71,6 +73,7 @@
         }
       }
       uploadToDesktop = false;
+
     } else {
       const json = JSON.stringify(file);
       const blob = new Blob([json], { type: "octet/stream" });
@@ -83,6 +86,15 @@
       window.URL.revokeObjectURL(url); // ts doesn't know about window.URL again
     }
   }
+
+
+  // make `error` disappear after 5 seconds
+  $: if (error) {
+    setTimeout(() => {
+      error = "";
+    }, 2500);
+  }
+
 </script>
 
 <div class=" sm:max-w-full rounded-sm">
@@ -90,11 +102,16 @@
   <marquee>
     <p class="font-bold">Create a config for Ascella.host now!!</p>
   </marquee>
-  <div class="flex mh-12 justify-center min-w-full text-red-950 bg-yellow-200 transition-all">{error}</div>
+<!--  <div class="flex mh-12 justify-center min-w-full text-red-950 bg-yellow-200 ">{error}</div>-->
+  {#if error}
+    <div class="toast">
+      <div class="alert alert-info">
+        {error}
+      </div>
+    </div>
+  {/if}
   <form
-    on:change={() => {
-      save();
-    }}
+    on:change={()=>{save()}}
     class="flex flex-wrap md:grid md:grid-cols-4 gap-4"
     on:submit|preventDefault={async () => {
       await submit();
@@ -106,40 +123,39 @@
       </marquee>
       <div class="grid grid-cols-2 gap-2 w-full">
         {#if domain === "custom"}
+
           <a target="_blank" href="/custom-domain-help" class="col-span-2">
             How to set up your domain for Ascella
             <OpenInNew class="inline-block" />
           </a>
 
-          <input class="input input-primary rounded-sm" bind:value={config.domain} placeholder="your.domain.com" />
+          <input class="input input-primary rounded-sm"
+                 bind:value={config.domain}
+                 placeholder="your.domain.com" />
+
         {:else}
           <p class="col-span-2">Optional custom subdomain</p>
 
-          <input
-            pattern="^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$"
-            class="input input-primary rounded-sm"
-            placeholder="subdomain."
-            bind:value={subdomain}
-            on:focusout={() => {
-              if (!subdomain.endsWith(".") && subdomain !== "") {
-                subdomain += ".";
-              }
-            }}
+          <input pattern="^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$" class="input input-primary rounded-sm"
+                 placeholder="subdomain."
+                 bind:value={subdomain}
+                 on:focusout={() => {
+                    if (!subdomain.endsWith('.') && subdomain !== '') {
+                      subdomain += '.'
+                    }
+                 }}
           />
+
         {/if}
 
-        <select
-          bind:value={domain}
-          on:change={() => {
-            if (domain === "custom") {
-              config.domain = "";
-            } else {
-              config.domain = domain;
-            }
-          }}
-          class="select select-primary rounded-sm"
-          required
-        >
+        <select bind:value={domain} on:change={()=> {
+          if (domain === "custom") {
+            config.domain = ''
+          } else {
+            config.domain = domain;
+          }
+
+        }} class="select select-primary rounded-sm" required>
           {#await domains then domains}
             {#each domains as domain}
               <option selected={domain === domain.domain}>{domain.domain}</option>
@@ -148,6 +164,7 @@
           <option value="custom" selected={domain === "custom"}>Custom</option>
         </select>
       </div>
+
     </div>
     <div class="form-control w-full my-2 col-span-2">
       <label class="animate-pulse">Ascella token</label>
@@ -157,19 +174,15 @@
           logging in here with discord
           <OpenInNew class="inline-block align-middle" />
         </a>
+
       </p>
-      <input bind:value={config.token} placeholder="ascella-token" class="input input-accent rounded-sm focus:translate-x-4" />
+      <input bind:value={config.token} placeholder="ascella-token"
+             class="input input-accent rounded-sm focus:translate-x-4" />
     </div>
     <div class="form-control w-full col-span-2">
       <p>Auto Delete Image days {config.days}</p>
-      <input
-        aria-label="Auto delete days silder"
-        bind:value={config.days}
-        type="range"
-        min="1"
-        max="365"
-        class="range range-secondary hover:range-primary duration-500"
-      />
+      <input aria-label="Auto delete days silder" bind:value={config.days} type="range" min="1" max="365"
+             class="range range-secondary hover:range-primary duration-500" />
     </div>
     <div class="form-control w-full my-2 col-span-2">
       <label class="animate-ping animate-pulse">Url Style</label>
@@ -185,24 +198,33 @@
     <details class="col-span-4">
       <summary> Advanced options</summary>
       <div class="grid grid-cols-4 gap-4">
+
         <div class="form-control w-full my-2 col-span-2">
           <label class="animate-pulse">Append</label>
-          <input bind:value={config.append} placeholder="append" class="input input-accent rounded-sm focus:translate-x-4" />
+          <input bind:value={config.append}
+                 placeholder="append"
+                 class="input input-accent rounded-sm focus:translate-x-4" />
         </div>
 
         <div class="form-control w-full my-2 col-span-1">
           <label class="animate-pulse">Custom Vanity Length</label>
-          <input bind:value={config.length} type="number" placeholder="length" class="input input-accent rounded-sm focus:translate-y-4" />
+          <input bind:value={config.length} type="number"
+                 placeholder="length"
+                 class="input input-accent rounded-sm focus:translate-y-4" />
         </div>
 
         <div class="form-control w-full my-2 col-span-1">
           <label class="animate-pulse">Custom Extension</label>
-          <input bind:value={config.ext} placeholder="ext" class="input input-accent rounded-sm focus:translate-x-8" />
+          <input bind:value={config.ext}
+                 placeholder="ext"
+                 class="input input-accent rounded-sm focus:translate-x-8" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Title</label>
-          <input bind:value={config.embed.title} placeholder="title" class="input input-accent rounded-sm focus:translate-y-4" />
+          <input bind:value={config.embed.title}
+                 placeholder="title"
+                 class="input input-accent rounded-sm focus:translate-y-4" />
         </div>
 
         <div class="form-control w-full my-2 col-span-2">
@@ -210,52 +232,50 @@
           <input
             bind:value={config.embed.description}
             placeholder="description"
-            class="input input-accent rounded-sm focus:translate-x-4"
-          />
+            class="input input-accent rounded-sm focus:translate-x-4" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Color</label>
-          <input bind:value={config.embed.color} placeholder="color" class="input input-accent rounded-sm focus:translate-y-10" />
+          <input bind:value={config.embed.color}
+                 placeholder="color"
+                 class="input input-accent rounded-sm focus:translate-y-10" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Site Name</label>
-          <input bind:value={config.embed.sitename} placeholder="sitename" class="input input-accent rounded-sm focus:translate-y-2" />
+          <input bind:value={config.embed.sitename}
+                 placeholder="sitename"
+                 class="input input-accent rounded-sm focus:translate-y-2" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Site Name URL</label>
-          <input
-            bind:value={config.embed["sitename-url"]}
-            placeholder="sitename-url"
-            class="input input-accent rounded-sm focus:translate-y-2"
-          />
+          <input bind:value={config.embed["sitename-url"]}
+                 placeholder="sitename-url"
+                 class="input input-accent rounded-sm focus:translate-y-2" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Author</label>
-          <input bind:value={config.embed.author} placeholder="author" class="input input-accent rounded-sm focus:translate-y-2" />
+          <input bind:value={config.embed.author}
+                 placeholder="author"
+                 class="input input-accent rounded-sm focus:translate-y-2" />
         </div>
 
         <div class="form-control w-full my-2">
           <label class="animate-pulse">Embed Author URL</label>
-          <input
-            bind:value={config.embed["author-url"]}
-            placeholder="author-url"
-            class="input input-accent rounded-sm focus:translate-y-2"
-          />
+          <input bind:value={config.embed["author-url"]}
+                 placeholder="author-url"
+                 class="input input-accent rounded-sm focus:translate-y-2" />
         </div>
       </div>
     </details>
 
     <div class="w-full col-span-4">
-      <label class="cursor-pointer max-w-2xl">
-        <input
-          bind:checked={agreed_to_tos}
-          type="checkbox"
-          class="checkbox border-gray-400 ease-in-out duration-400 transition-colors checkbox-error"
-        />
+      <label class="cursor-pointer max-w-2xl ">
+        <input bind:checked={agreed_to_tos} type="checkbox"
+               class="checkbox border-gray-400 ease-in-out duration-400 transition-colors checkbox-error" />
         <span class="label-text">
           I accept the ascella
           <a href="/rules" target="_blank" class="underline">
@@ -269,48 +289,56 @@
       <span class="animate-ping"><DL /></span>
       <span> Download Config (.sxcu) </span>
     </button>
-    <button name="xy-type" value="desktop" type="submit" class="btn btn-primary col-span-1" on:click={() => (uploadToDesktop = true)}>
+    <button name="xy-type" value="desktop" type="submit"
+            class="btn btn-primary col-span-1"
+            on:click={() => (uploadToDesktop = true)}>
       <span> Upload config to ascella desktop </span>
     </button>
+
   </form>
   <div class="py-3 text-center">
     <p class="col-span-2">
       On linux or mac without sharex? no problem try out
-      <a href="https://github.com/ascellahost/gui" class="link link-hover link-secondary" on:click={save} target="_blank">
+      <a href="https://github.com/ascellahost/gui"
+         class="link link-hover link-secondary"
+         on:click={save}
+         target="_blank">
         The desktop app <OpenInNew class="inline-block align-middle " />
       </a>
     </p>
-    <a href="/upload" on:click={save} class="link link-hover link-primary font-extrabold text-xl"
-      >Or try the web version <OpenInNew class="inline-block align-middle " /></a
-    >
+    <a href="/upload" on:click={save} class="link link-hover link-primary font-extrabold text-xl">Or try the web client <OpenInNew class="inline-block align-middle " /></a>
   </div>
+
 </div>
 
+
 <style>
-  /* KINDLY STOLEN FROM https://css-tricks.com/how-to-animate-the-details-element/*/
 
-  summary {
-    padding: 1rem;
-    display: block;
-    padding-left: 2.2rem;
-    position: relative;
-    cursor: pointer;
-  }
+    /* KINDLY STOLEN FROM https://css-tricks.com/how-to-animate-the-details-element/*/
 
-  summary:before {
-    content: "";
-    border-width: 0.4rem;
-    border-style: solid;
-    border-color: transparent transparent transparent #fff;
-    position: absolute;
-    top: 1.3rem;
-    left: 1rem;
-    transform: rotate(0);
-    transform-origin: 0.2rem 50%;
-    transition: 0.25s transform ease;
-  }
+    summary {
+        padding: 1rem;
+        display: block;
+        padding-left: 2.2rem;
+        position: relative;
+        cursor: pointer;
+    }
 
-  details[open] > summary:before {
-    transform: rotate(90deg);
-  }
+    summary:before {
+        content: '';
+        border-width: .4rem;
+        border-style: solid;
+        border-color: transparent transparent transparent #fff;
+        position: absolute;
+        top: 1.3rem;
+        left: 1rem;
+        transform: rotate(0);
+        transform-origin: .2rem 50%;
+        transition: .25s transform ease;
+    }
+
+    details[open] > summary:before {
+        transform: rotate(90deg);
+    }
+
 </style>

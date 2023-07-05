@@ -4,9 +4,5 @@ import Layout from "../layouts/layout.astro";
 ---
 
 <Layout title="Upload Form">
-    <div class="w-full mx-auto min-h-[40rem] max-w-[70rem]">
-        <h1 class="text-center text-lg">Upload a Image/File</h1>
-        <p class="text-center">Your settings from the config wizard are used!</p>
-        <UploadForm client:load />
-    </div>
+    <UploadForm client:load />
 </Layout>
