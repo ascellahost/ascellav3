@@ -259,15 +259,15 @@ api.post("/upload", async (c) => {
         }
       }
 
-
+      const decodeInject = (str: string | undefined, data: Record<string, any>) => stringInject(decodeURIComponent(str ?? ""), data);
       const embed = {
         color: (settings?.embed?.color === "random" ? getRandomVibrantHexColor() : stringInject(settings.embed?.color, replaces)) ?? "",
-        title: stringInject(settings.embed?.title, replaces),
-        description: stringInject(settings.embed?.description, replaces),
-        sitename: stringInject(settings.embed?.sitename, replaces),
-        sitenameUrl: stringInject(settings.embed?.["sitename-url"], replaces) ?? "",
-        author: stringInject(settings.embed?.author, replaces),
-        authorUrl: stringInject(settings.embed?.["author-url"], replaces) ?? "",
+        title: decodeInject(settings.embed?.title, replaces),
+        description: decodeInject(settings.embed?.description, replaces),
+        sitename: decodeInject(settings.embed?.sitename, replaces),
+        sitenameUrl: decodeInject(settings.embed?.["sitename-url"], replaces) ?? "",
+        author: decodeInject(settings.embed?.author, replaces),
+        authorUrl: decodeInject(settings.embed?.["author-url"], replaces) ?? "",
       };
 
 

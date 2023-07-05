@@ -41,7 +41,6 @@ export function getRandomVibrantHexColor() {
   const lightness = Math.floor(Math.random() * 31) + 40; // Set lightness between 40% and 70%
 
   const chroma = (1 - Math.abs(2 * lightness / 100 - 1)) * saturation / 100;
-  const x = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
   const m = lightness / 100 - chroma / 2;
 
   const rgb = [hue + 120, hue, hue - 120].map(color => {

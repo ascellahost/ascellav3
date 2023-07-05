@@ -43,11 +43,13 @@ export type Review = {
   avatar: string;
   comment: string;
 };
+
+const MEGABYTE = 1024 * 1024;
 export enum UploadLimits {
-  Guest = 1024 * 1024 * 5,
-  User = 1024 * 1024 * 10,
-  Premium = 1024 * 1024 * 100,
-  Admin = 1024 * 1024 * 512,
+  Guest = MEGABYTE * 2.5,
+  User = MEGABYTE * 5,
+  Premium = MEGABYTE * 100,
+  Admin = MEGABYTE * 512,
 }
 export enum Styles {
   default = 1,
