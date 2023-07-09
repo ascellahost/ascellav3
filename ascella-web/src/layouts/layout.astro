@@ -53,7 +53,7 @@ const { title, description } = Astro.props;
     <span id="lightdark" class="text-5xl cursor-pointer" aria-label="Darkmode switch" role="button"
           set:html={svgToggleSwitch} />
     <span class="my-auto"><WeatherNight /></span>
-    <PWAInstall client:load />
+    <PWAInstall client:idle />
   </div>
 </div>
 

@@ -1,23 +1,21 @@
 <script>
-  import { fly } from 'svelte/transition';
+  import { fly } from "svelte/transition";
 
   import { onMount } from "svelte";
 
   let showInstallPromotion = false;
-  let button;
   let deferredPrompt;
 
   onMount(() => {
-    window.addEventListener("beforeinstallprompt", e => {
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
       showInstallPromotion = true;
     });
 
-    window.addEventListener("appinstalled", e => {
+    window.addEventListener("appinstalled", (e) => {
       // save the fact that the app has been installed
     });
-
   });
 
   async function installApp() {
@@ -33,11 +31,17 @@
       showInstallPromotion = false;
     }
   }
-
 </script>
 
 {#if showInstallPromotion}
-  <button in:fly={{delay:700, x: 20}} bind:this={button} on:click={() => {installApp()}} id="install" class="btn mx-3 transition">
+  <button
+    in:fly={{ delay: 700, y: 20 }}
+    on:click={() => {
+      installApp();
+    }}
+    id="install"
+    class="btn mx-3 transition"
+  >
     INSTALL PWA
   </button>
 {/if}
