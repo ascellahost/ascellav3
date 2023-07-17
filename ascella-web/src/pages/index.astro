@@ -3,6 +3,8 @@ import Main from "../components/main.svelte";
 import Layout from "../layouts/layout.astro";
 
 let stats = await fetch("https://api.ascella.host/api/v3/stats.json").then((r) => r.json());
+
+export const prerender = false;
 ---
 
 <Layout>
