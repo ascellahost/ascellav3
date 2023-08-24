@@ -2,10 +2,7 @@
 title: Rules
 description: Ascella Uploader rules
 layout: ../layouts/postLayout.astro
-prerender: true
 ---
-
-export const prerender = true;
 
 ### Rules
 

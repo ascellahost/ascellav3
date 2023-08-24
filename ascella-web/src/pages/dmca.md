@@ -1,0 +1,7 @@
+---
+title: DMCA
+description: Information about how Ascella handles DMCA requests
+layout: ../layouts/postLayout.astro
+---
+
+If any content infringes your copyright you can file a complaint to dmca@ascella.host with the vanity URL in use, and as much info as possible regarding your request. Thanks!
